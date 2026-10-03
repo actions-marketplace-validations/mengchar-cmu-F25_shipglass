@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shipglass"
+version = "0.1.0"
+description = "See what changed inside your release. Offline archive comparison with a visual report."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Mengchao Ren"}]
+keywords = ["release", "archive", "diff", "wheel", "npm", "visualization"]
+classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Topic :: Software Development :: Quality Assurance"]
+
+[project.scripts]
+shipglass = "shipglass.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/mengchar-cmu-F25/shipglass"
+Issues = "https://github.com/mengchar-cmu-F25/shipglass/issues"
+
+[tool.setuptools.package-data]
+shipglass = ["*.html"]

@@ -1,0 +1,23 @@
+name: Feature request
+description: Describe a release-review workflow Shipglass could improve.
+title: "idea: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the archive or release workflow and what is difficult today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help?
+      description: A small example or expected output is useful. Please remove private information.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What do you use today?
+      description: Optional. Existing commands or tools help us understand the gap.
