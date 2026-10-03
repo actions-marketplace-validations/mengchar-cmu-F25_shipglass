@@ -1,3 +1,4 @@
+import gzip
 import hashlib
 import io
 import json
@@ -133,6 +134,36 @@ class ArchiveTests(unittest.TestCase):
         path = self.tar("large.tgz", [("small", b"data")])
         with patch.object(core, "MAX_TAR_STREAM_BYTES", 100), self.assertRaisesRegex(ValueError, "stream limit"):
             core.scan(path)
+
+    def test_gzip_tar_rejects_invalid_or_missing_trailer(self):
+        for extension in ("tgz", "tar.gz"):
+            path = self.tar("trailer." + extension, [("file.txt", b"content")])
+            original = path.read_bytes()
+            self.assertEqual(core.scan(path)["files"][0]["sha256"], hashlib.sha256(b"content").hexdigest())
+            for corruption in ("crc", "size", "missing"):
+                with self.subTest(extension=extension, corruption=corruption):
+                    data = bytearray(original)
+                    if corruption == "missing":
+                        del data[-8:]
+                    else:
+                        data[-8 if corruption == "crc" else -4] ^= 1
+                    path.write_bytes(data)
+                    with self.assertRaisesRegex(ValueError, "Cannot read tar.gz archive"):
+                        core.scan(path)
+
+    def test_tar_stream_limit_includes_padding_after_end_marker(self):
+        payload = self.tar("base.tar", [("file.txt", b"content")]).read_bytes() + b"\0" * 65536
+        for extension in ("tar", "tgz", "tar.gz"):
+            with self.subTest(extension=extension):
+                path = self.root / ("padded." + extension)
+                path.write_bytes(payload if extension == "tar" else gzip.compress(payload))
+                with patch.object(core, "MAX_TAR_STREAM_BYTES", len(payload)):
+                    result = core.scan(path)
+                self.assertEqual(result["total_bytes"], 7)
+                self.assertEqual([item["path"] for item in result["files"]], ["file.txt"])
+                with patch.object(core, "MAX_TAR_STREAM_BYTES", len(payload) - 1):
+                    with self.assertRaisesRegex(ValueError, "stream limit"):
+                        core.scan(path)
 
     def test_tar_links_are_not_dereferenced_or_disclosed(self):
         path = self.root / "links.tar"

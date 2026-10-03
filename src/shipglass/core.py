@@ -283,7 +283,8 @@ def _scan_tar(path: Path, strip_components: int, compressed: bool) -> list[dict]
     budget = _Budget()
     opener = gzip.open if compressed else open
     with opener(path, "rb") as source:
-        with tarfile.open(fileobj=_LimitedReader(source), mode="r|") as archive:
+        reader = _LimitedReader(source)
+        with tarfile.open(fileobj=reader, mode="r|") as archive:
             for info in archive:
                 member_path = budget.member(info.name, info.size, strip_components, info.isdir())
                 if not (info.isfile() or info.isdir() or info.issym() or info.islnk()):
@@ -302,6 +303,9 @@ def _scan_tar(path: Path, strip_components: int, compressed: bool) -> list[dict]
                     with stream:
                         sha256, _ = _digest(stream, info.size)
                     files.append(_record(member_path[0], info.size, sha256, "file"))
+        # Tar stops at its end marker; consume padding and validate gzip's trailer.
+        while reader.read(CHUNK_BYTES):
+            pass
     return files
 
 

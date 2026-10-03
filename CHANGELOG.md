@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1 — 2026-10-03
+
+- Reject gzip-compressed TAR archives with damaged checksums, incorrect expanded-size trailers, or missing trailers instead of reporting a successful scan.
+- Apply the expanded TAR stream limit to the entire input, including bytes after the TAR end marker.
+- Keep invalid inputs from producing HTML, JSON, or Markdown reports.
+
 ## 0.3.0 — 2026-10-03
 
 - Compare two exact public npm versions with `shipglass npm PACKAGE BEFORE_VERSION AFTER_VERSION`.

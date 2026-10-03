@@ -1,6 +1,7 @@
 import contextlib
 import io
 import json
+import tarfile
 import tempfile
 import unittest
 import zipfile
@@ -215,6 +216,26 @@ class CliTests(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn('ZIP end-of-directory record is missing or truncated', error)
         self.assertNotIn('Traceback', error)
+
+    def test_corrupt_gzip_writes_no_reports(self):
+        package = self.root / 'broken.tgz'
+        with tarfile.open(package, 'w:gz') as archive:
+            member = tarfile.TarInfo('index.js')
+            member.size = 3
+            archive.addfile(member, io.BytesIO(b'abc'))
+        raw = bytearray(package.read_bytes())
+        raw[-8] ^= 1  # Corrupt the gzip CRC without changing its file payload.
+        package.write_bytes(raw)
+        before = self.archive('before.zip', {'index.js': 'abc'})
+        for arguments in [('inspect', package), ('compare', before, package)]:
+            with self.subTest(command=arguments[0]):
+                code, output, error = self.run_cli(*arguments, '-o', self.report, '--json', self.data, '--markdown', self.markdown)
+                self.assertEqual(code, 2)
+                self.assertIn('Cannot read tar.gz archive', error)
+                self.assertNotIn('Traceback', error)
+                self.assertEqual(output, '')
+                for path in (self.report, self.data, self.markdown):
+                    self.assertFalse(path.exists())
 
     def test_terminal_display_escapes_control_characters(self):
         from shipglass.cli import _display
