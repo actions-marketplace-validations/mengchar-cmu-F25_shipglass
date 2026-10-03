@@ -10,7 +10,7 @@ file details, empty results, and a narrow mobile viewport. The report loads no
 remote scripts, fonts, or stylesheets. HTML serialization tests include hostile
 script delimiters in filenames.
 
-Four public package pairs were downloaded from their official registries and scanned
+Five public package pairs were downloaded from their official registries and scanned
 without executing or installing their contents:
 
 | Artifacts | Before payload | After payload | Observed changes |
@@ -19,6 +19,7 @@ without executing or installing their contents:
 | `is-number` 6.0.0 → 7.0.0 tarballs from npm | 8,960 B | 9,615 B | 4 changed |
 | [`vite` 6.0.0 → 7.0.0 tarballs from npm](examples/vite.md) | 2,804,531 B | 2,267,804 B | 20 changed, 13 added, 8 removed |
 | [`rich` 13.9.4 → 14.0.0 wheels from PyPI](examples/rich.md) | 955,765 B | 959,611 B | 7 changed, 4 added, 4 removed |
+| [`typescript` 4.9.5 → 5.0.4 tarballs from npm](examples/typescript.md) | 66,849,652 B | 39,203,145 B | 95 changed, 6 added, 7 removed |
 
 The wheel's version-specific `.dist-info` directory changes its paths, so those
 members appear as added and removed. This is intentional path-based comparison.
@@ -26,7 +27,9 @@ members appear as added and removed. This is intentional path-based comparison.
 The Vite and Rich comparisons were generated with version 0.2.0. Their linked
 recipes record exact versions, official registry sources, and download and
 comparison commands. The [live demo](https://mengchar-cmu-f25.github.io/shipglass/)
-allows switching between both real examples and the synthetic one.
+allows switching between the real examples and the synthetic one. The TypeScript
+comparison was generated with version 0.3.2. Its expanded byte totals and file
+counts match npm registry metadata for the two exact versions.
 
 Version 0.3.0's `npm` command was also exercised from an isolated installation of
 its built wheel against the public registry. `vite 6.0.0 7.0.0` reproduced the
