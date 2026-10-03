@@ -1,6 +1,6 @@
 # Rich: 13.9.4 → 14.0.0
 
-[Open the interactive report](https://mengchar-cmu-f25.github.io/shipglass/?example=rich) for two real Python wheels, compared with Shipglass **0.2.0**. The wheels were downloaded from official PyPI release metadata: [Rich 13.9.4](https://pypi.org/pypi/rich/13.9.4/json) and [Rich 14.0.0](https://pypi.org/pypi/rich/14.0.0/json). Neither package was installed or executed.
+[Open the interactive report](https://mengchar-cmu-f25.github.io/shipglass/?example=rich) for two real Python wheels, reproduced with Shipglass **0.4.0**. The wheels were downloaded from official PyPI release metadata: [Rich 13.9.4](https://pypi.org/pypi/rich/13.9.4/json) and [Rich 14.0.0](https://pypi.org/pypi/rich/14.0.0/json). Neither package was installed or executed.
 
 | Measurement | 13.9.4 | 14.0.0 | Change |
 | --- | ---: | ---: | ---: |
@@ -16,35 +16,15 @@ The largest individual added and removed entries are each `METADATA` (18,274 B).
 
 ## Reproduce
 
-With Python 3.10+ and Shipglass 0.2.0 installed, run this in a shell. It creates a clean temporary folder, resolves the exact universal wheel filenames from the version-specific PyPI JSON, and downloads only those wheels.
+With Python 3.10+ and [Shipglass 0.4.0 or newer](../../README.md#try-it), run:
 
 ```sh
-rich_example_dir="$(mktemp -d)"
-cd "$rich_example_dir"
-
-python3 - <<'PY'
-import json
-from urllib.request import urlopen, urlretrieve
-
-for version in ("13.9.4", "14.0.0"):
-    with urlopen(f"https://pypi.org/pypi/rich/{version}/json") as response:
-        release = json.load(response)
-    filename = f"rich-{version}-py3-none-any.whl"
-    wheel = next(
-        file for file in release["urls"]
-        if file["filename"] == filename and file["packagetype"] == "bdist_wheel"
-    )
-    urlretrieve(wheel["url"], filename)
-    print(filename)
-PY
-
-shipglass --version
-shipglass compare \
-  rich-13.9.4-py3-none-any.whl \
-  rich-14.0.0-py3-none-any.whl \
+shipglass pypi rich 13.9.4 14.0.0 \
   --output rich.html \
   --json rich.json \
   --markdown rich-summary.md
 ```
+
+The command selects the unique non-yanked universal Python 3 wheel from each exact PyPI release, verifies its published SHA-256 and size, and removes the temporary downloads when finished. See the [PyPI guide](../pypi.md) for selection rules and network limits.
 
 Open `rich.html` locally. Search for `rich/traceback.py`, switch between Before and After, or choose the Added filter to inspect the versioned metadata. The report is self-contained and contains file metadata, not the wheels' source contents.

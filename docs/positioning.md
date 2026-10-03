@@ -31,7 +31,7 @@ Shipglass does not aim to replace these tools. Its design priorities are a quick
 ## Current boundaries
 
 - Local `.zip`, `.whl`, `.tar`, `.tgz`, and `.tar.gz` inputs.
-- An explicit `npm` command can download two exact public npm versions for comparison, without package installation or script execution.
+- Explicit `npm` and `pypi` commands can download two exact public releases for comparison, without package installation or script execution. PyPI selection is limited to unambiguous universal Python 3 wheels.
 - Match members by their paths inside the archives, with optional explicit `--strip-components N` applied to both inputs.
 - Compare file content using SHA-256, including same-size changes.
 - Report added, removed, changed, and unchanged files.

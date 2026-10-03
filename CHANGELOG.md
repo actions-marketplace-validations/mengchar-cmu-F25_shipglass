@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 — 2026-10-03
+
+- Compare two exact public PyPI releases with `shipglass pypi PACKAGE BEFORE_VERSION AFTER_VERSION` when each has one unambiguous, non-yanked universal Python 3 wheel.
+- Verify the published SHA-256 and archive size, bound downloads, and remove temporary wheels without installing or executing their contents.
+- Reject ambiguous, platform-specific, missing, or yanked wheels with guidance for explicit local archive comparison.
+- Reproduce the Rich example in one command with the same HTML, JSON, Markdown, and optional checks as npm comparisons.
+- Add a TypeScript 4.9.5 → 5.0.4 case study and compare Shipglass's own built wheel with an explicitly selected release in CI.
+
 ## 0.3.2 — 2026-10-03
 
 - Sort the file manifest by the largest size across both releases, including removed and newly added files, independently of the treemap snapshot.

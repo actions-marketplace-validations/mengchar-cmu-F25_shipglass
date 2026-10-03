@@ -128,14 +128,57 @@ class CliTests(unittest.TestCase):
         self.assertIn('output files must use different paths', error)
         self.assertFalse(self.report.exists())
 
+    def test_pypi_reports_keep_version_labels_and_policy_results(self):
+        first = self.archive('package-1.0.0.whl', {'package/__init__.py': 'old'})
+        second = self.archive('package-2.0.0.whl', {'package/__init__.py': 'longer', 'package/.env': 'fixture'})
+        for flags in [(), ('--fail-on-growth', '0'), ('--fail-on-warnings',)]:
+            with self.subTest(flags=flags), mock.patch('shipglass.cli.pypi.download', side_effect=self.downloader({'1.0.0': first, '2.0.0': second})) as download:
+                code, _, error = self.run_cli('pypi', 'package', '1.0.0', '2.0.0', '-o', self.report, '--json', self.data, '--markdown', self.markdown, '--strip-components', '1', *flags)
+                self.assertEqual(code, 1 if flags else 0)
+                data = json.loads(self.data.read_text())
+                self.assertEqual(data['before']['name'], 'package==1.0.0')
+                self.assertEqual(data['after']['name'], 'package==2.0.0')
+                self.assertEqual(data['summary']['changed'], 1)
+                self.assertEqual([f['path'] for f in data['files']], ['.env', '__init__.py'])
+                self.assertIn('Downloading package==2.0.0', error)
+                for path in (self.report, self.data, self.markdown):
+                    self.assertTrue(path.exists())
+                for call in download.call_args_list:
+                    self.assertFalse(call.args[2].exists())
+
+    def test_pypi_same_version_downloads_once(self):
+        package = self.archive('package-1.0.0.whl', {'package.py': 'ok'})
+        with mock.patch('shipglass.cli.pypi.download', side_effect=self.downloader({'1.0.0': package})) as download:
+            code, _, _ = self.run_cli('pypi', 'package', '1.0.0', '1.0.0', '-o', self.report, '--json', self.data)
+        self.assertEqual(code, 0)
+        download.assert_called_once()
+        self.assertFalse(download.call_args.args[2].exists())
+        summary = json.loads(self.data.read_text())['summary']
+        self.assertEqual((summary['changed'], summary['delta_bytes'], summary['unchanged']), (0, 0, 1))
+
+    def test_pypi_failure_cleans_downloads_and_writes_no_reports(self):
+        def fail_download(package, version, directory):
+            path = directory / 'partial.whl'
+            path.write_bytes(b'partial')
+            raise ValueError('No universal Python 3 wheel is available.')
+
+        with mock.patch('shipglass.cli.pypi.download', side_effect=fail_download) as download:
+            code, _, error = self.run_cli('pypi', 'package', '1.0', '2.0', '-o', self.report, '--json', self.data, '--markdown', self.markdown)
+        self.assertEqual(code, 2)
+        self.assertIn('No universal Python 3 wheel', error)
+        self.assertFalse(download.call_args.args[2].exists())
+        for path in (self.report, self.data, self.markdown):
+            self.assertFalse(path.exists())
+
     def test_local_commands_do_not_download_packages(self):
         first = self.archive('before.zip', {'index.js': 'old'})
         second = self.archive('after.zip', {'index.js': 'new'})
-        with mock.patch('shipglass.cli.npm.download', side_effect=AssertionError('unexpected network access')) as download:
+        with mock.patch('shipglass.cli.npm.download', side_effect=AssertionError('unexpected network access')) as download, mock.patch('shipglass.cli.pypi.download', side_effect=AssertionError('unexpected PyPI access')) as pypi_download:
             for args in [('compare', first, second), ('inspect', second), ('demo',)]:
                 with self.subTest(command=args[0]):
                     self.assertEqual(self.run_cli(*args, '-o', self.report)[0], 0)
         download.assert_not_called()
+        pypi_download.assert_not_called()
 
     def test_compare_writes_report_and_json_without_contents(self):
         first = self.archive('before.zip', {'index.js': 'old'})

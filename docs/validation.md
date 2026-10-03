@@ -60,3 +60,17 @@ The built-in Orbit UI example is synthetic. Repetitive fixture payloads make its
 compressed archives much smaller than typical real-world JavaScript packages.
 Its 6 MiB source map illustrates expanded size growth, not a measured production
 incident or actual credential leak.
+
+The project's own [wheel comparison run](https://github.com/mengchar-cmu-F25/shipglass/actions/runs/37132406849)
+compared its built candidate with the published v0.3.2 wheel. All nine build/install/test
+jobs passed. Its downloaded `shipglass-wheel-diff` artifact contained exactly HTML,
+JSON, and Markdown reports; the comparison correctly identified the README-driven
+`METADATA` change and its updated `RECORD` entry.
+
+Version 0.4.0 adds the PyPI command. All 99 tests passed locally, including wheel
+selection, digest/size checks, host restrictions, download failures, cleanup, and
+CLI reports and exit codes. A real Rich 13.9.4 → 14.0.0 run reproduced every file
+change and byte total in the earlier manual example. `Typing_Extensions 4.12.2`
+compared with itself downloaded once and produced no changes. NumPy 2.2.0 (no
+universal Python 3 wheel) and the Rich `14.0` version alias both returned exit 2
+without generating a report.

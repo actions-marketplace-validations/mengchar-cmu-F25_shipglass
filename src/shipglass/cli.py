@@ -8,7 +8,7 @@ import tempfile
 from itertools import combinations
 from pathlib import Path
 
-from . import __version__, npm
+from . import __version__, npm, pypi
 from .core import compare, scan
 from .demo import create_demo
 from .markdown import render_markdown
@@ -29,18 +29,18 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='See what changed inside your release. No uploads, no package scripts.')
     parser.add_argument('--version', action='version', version=f'shipglass {__version__}')
     commands = parser.add_subparsers(dest='command', required=True)
-    for name, help_text in [('compare', 'Compare two local release archives'), ('npm', 'Compare two exact public npm package versions'), ('inspect', 'Inspect one local archive'), ('demo', 'Explore a synthetic release with a 6 MiB surprise')]:
+    for name, help_text in [('compare', 'Compare two local release archives'), ('npm', 'Compare two exact public npm package versions'), ('pypi', 'Compare universal Python 3 wheels from two exact PyPI releases'), ('inspect', 'Inspect one local archive'), ('demo', 'Explore a synthetic release with a 6 MiB surprise')]:
         command = commands.add_parser(name, help=help_text)
         if name == 'compare':
             command.add_argument('before', type=Path)
             command.add_argument('after', type=Path)
-        elif name == 'npm':
+        elif name in ('npm', 'pypi'):
             command.add_argument('package')
             command.add_argument('before_version')
             command.add_argument('after_version')
         elif name == 'inspect':
             command.add_argument('artifact', type=Path)
-        if name in ('compare', 'npm'):
+        if name in ('compare', 'npm', 'pypi'):
             command.add_argument('--fail-on-growth', type=_nonnegative, metavar='BYTES', help='Exit 1 if unpacked growth exceeds BYTES; still write reports')
         command.add_argument('-o', '--output', type=Path, default=Path('shipglass-report.html'), help='HTML output path (default: shipglass-report.html)')
         command.add_argument('--json', type=Path, dest='json_output', metavar='PATH', help='Also write the structured comparison')
@@ -93,19 +93,21 @@ def main(argv: list[str] | None = None) -> int:
                 result = compare(scan(first), scan(second))
         elif args.command == 'compare':
             result = compare(scan(args.before, strip_components=args.strip_components), scan(args.after, strip_components=args.strip_components))
-        elif args.command == 'npm':
-            with tempfile.TemporaryDirectory(prefix='shipglass-npm-') as directory:
-                print(f'Downloading {_display(args.package)}@{_display(args.before_version)}', file=sys.stderr)
-                first = npm.download(args.package, args.before_version, Path(directory))
+        elif args.command in ('npm', 'pypi'):
+            registry = npm if args.command == 'npm' else pypi
+            separator = '@' if args.command == 'npm' else '=='
+            with tempfile.TemporaryDirectory(prefix=f'shipglass-{args.command}-') as directory:
+                print(f'Downloading {_display(args.package)}{separator}{_display(args.before_version)}', file=sys.stderr)
+                first = registry.download(args.package, args.before_version, Path(directory))
                 if args.after_version == args.before_version:
                     second = first
                 else:
-                    print(f'Downloading {_display(args.package)}@{_display(args.after_version)}', file=sys.stderr)
-                    second = npm.download(args.package, args.after_version, Path(directory))
+                    print(f'Downloading {_display(args.package)}{separator}{_display(args.after_version)}', file=sys.stderr)
+                    second = registry.download(args.package, args.after_version, Path(directory))
                 before = scan(first, strip_components=args.strip_components)
                 after = scan(second, strip_components=args.strip_components)
-                before['name'] = f'{args.package}@{args.before_version}'
-                after['name'] = f'{args.package}@{args.after_version}'
+                before['name'] = f'{args.package}{separator}{args.before_version}'
+                after['name'] = f'{args.package}{separator}{args.after_version}'
                 result = compare(before, after)
         else:
             current = scan(args.artifact, strip_components=args.strip_components)

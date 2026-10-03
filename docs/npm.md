@@ -44,7 +44,7 @@ If a configured check fails, the comparison step fails but the summary and uploa
 
 ## Network and storage
 
-Only `npm` opts into downloading. The `compare`, `inspect`, and `demo` commands remain offline. The npm command requests the package names and versions you enter from `registry.npmjs.org`, using its [version metadata API](https://github.com/npm/registry/blob/main/docs/REGISTRY-API.md#getpackageversion). It accepts tarballs and redirects only on that registry over HTTPS and does not load npm credentials or `.npmrc` configuration.
+The `npm` and [`pypi`](pypi.md) commands explicitly opt into downloading. The `compare`, `inspect`, and `demo` commands remain offline. The npm command requests the package names and versions you enter from `registry.npmjs.org`, using its [version metadata API](https://github.com/npm/registry/blob/main/docs/REGISTRY-API.md#getpackageversion). It accepts tarballs and redirects only on that registry over HTTPS and does not load npm credentials or `.npmrc` configuration.
 
 Metadata responses are limited to 1 MiB. Downloads are limited to 1 GiB per archive, and the normal [archive scanning limits](../README.md#compare-what-you-ship) still apply. A failed download, digest mismatch, invalid metadata response, or unsupported archive stops the comparison. Downloaded archives are temporary and are removed after the command completes or reports an error; generated reports stay at the paths you selected.
 
