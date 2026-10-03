@@ -40,6 +40,8 @@ To run it in your own repository, copy [`.github/workflows/npm.yml`](../.github/
 
 After the run, read the job summary or download the `package-release-diff` artifact and open `report.html` locally. GitHub requires sign-in and repository access to download workflow artifacts. By default, the comparison records changes without failing on growth or filename cautions. To enforce a limit, append an existing CLI option such as `--fail-on-growth 1000000` or `--fail-on-warnings` to the comparison command in your copy of the workflow.
 
+See a [completed Vite comparison](https://github.com/mengchar-cmu-F25/shipglass/actions/runs/37133401505) using this workflow and the published v0.4.0 wheel. Its report records the same 536,727-byte reduction as the local example.
+
 If a configured check fails, the comparison step fails but the summary and upload steps still preserve its reports. Download, validation, or archive errors fail the job without producing a new report. The summary step only reads an existing `report.md`, and the upload step ignores absent reports; neither converts a failed comparison into a successful job. These steps are skipped if the workflow is cancelled.
 
 ## Network and storage

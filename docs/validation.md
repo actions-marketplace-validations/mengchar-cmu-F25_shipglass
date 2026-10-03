@@ -74,3 +74,12 @@ change and byte total in the earlier manual example. `Typing_Extensions 4.12.2`
 compared with itself downloaded once and produced no changes. NumPy 2.2.0 (no
 universal Python 3 wheel) and the Rich `14.0` version alias both returned exit 2
 without generating a report.
+
+The public v0.4.0 wheel was then installed by URL in an isolated environment;
+both Rich and Vite reproduced the measured totals above. The shared manual
+workflow's [PyPI run](https://github.com/mengchar-cmu-F25/shipglass/actions/runs/37133399124)
+and [npm run](https://github.com/mengchar-cmu-F25/shipglass/actions/runs/37133401505)
+succeeded. Each downloaded `package-release-diff` artifact contained exactly
+`report.html`, `report.json`, and `report.md`, with the expected versions and byte
+totals. The release's nine OS/Python test jobs and three Action integration jobs
+also passed.
