@@ -43,6 +43,16 @@ tests passed locally. An isolated installation of the built wheel reproduced the
 Vite byte totals above and returned exit code 2 for a corrupted gzip fixture,
 without generating HTML, JSON, or Markdown reports.
 
+Version 0.3.2 was checked in a browser with added, removed, growing, and shrinking
+files: largest-file order stays the same when switching treemap snapshots.
+Checks covered desktop and 390-pixel layouts, plus forward/backward navigation
+and keyboard focus across an 83-file manifest. The built wheel produced exactly
+the same report as the source checkout. The manual npm workflow was also run on
+GitHub: its [Vite comparison](https://github.com/mengchar-cmu-F25/shipglass/actions/runs/37130884917)
+produced the three expected reports and the byte totals above. An intentional
+[`latest` input rejection](https://github.com/mengchar-cmu-F25/shipglass/actions/runs/37130952938)
+failed the job without uploading a report.
+
 The built-in Orbit UI example is synthetic. Repetitive fixture payloads make its
 compressed archives much smaller than typical real-world JavaScript packages.
 Its 6 MiB source map illustrates expanded size growth, not a measured production
