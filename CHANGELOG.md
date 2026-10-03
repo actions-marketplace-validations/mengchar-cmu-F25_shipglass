@@ -4,6 +4,7 @@
 
 - Sort the file manifest by the largest size across both releases, including removed and newly added files, independently of the treemap snapshot.
 - Clarify the size-sort option and refresh the public example reports with the corrected ordering.
+- Return to the file manifest heading after changing pages, including keyboard focus, so reviewers can read the next files without scrolling back manually.
 
 ## 0.3.1 — 2026-10-03
 

@@ -42,7 +42,7 @@
     <div class="map-layout"><div class="map-wrap"><div id="treemap" class="treemap" role="group" aria-label="File size treemap"></div></div><aside class="inspector" aria-label="Selected file details"><div class="inspector-label"><span>File inspection</span><span class="selection-hint">Select any block</span></div><svg class="file-icon" viewBox="0 0 32 38" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 2h14l8 8v26H5zM19 2v8h8M10 18h12M10 23h12M10 28h7"/></svg><div id="detail-content"></div></aside></div>
     <div class="map-footer"><div class="legend" aria-label="File change colors"><span><i style="background:#2c5dd3"></i>Added</span><span><i style="background:#99b8fa"></i>Changed</span><span><i style="background:#edc586"></i>Removed / smaller</span><span><i style="background:#d8e2f1"></i>Unchanged</span></div><div id="map-caption" class="map-caption"></div></div>
   </section>
-  <section id="files" class="manifest" aria-labelledby="files-heading"><div class="manifest-heading"><h2 id="files-heading">File manifest<span id="manifest-total" class="manifest-total"></span></h2><label class="sort-label">Sort by<select id="sort"><option value="impact">Largest change</option><option value="size">Largest file (either release)</option><option value="path">File path</option><option value="status">Status</option></select></label></div>
+  <section id="files" class="manifest" aria-labelledby="files-heading"><div class="manifest-heading"><h2 id="files-heading" tabindex="-1">File manifest<span id="manifest-total" class="manifest-total"></span></h2><label class="sort-label">Sort by<select id="sort"><option value="impact">Largest change</option><option value="size">Largest file (either release)</option><option value="path">File path</option><option value="status">Status</option></select></label></div>
     <div class="filter-bar"><label class="search"><span class="sr-only">Search file paths</span><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5"/><path d="m11.5 11.5 4 4"/></svg><input id="search" type="search" placeholder="Find a file or directory…" autocomplete="off" spellcheck="false"></label><div class="filter-buttons" aria-label="Filter files by status"><button class="filter-button" type="button" data-status="all" aria-pressed="true">All files</button><button class="filter-button" type="button" data-status="changed" aria-pressed="false">Changed</button><button class="filter-button" type="button" data-status="added" aria-pressed="false">Added</button><button class="filter-button" type="button" data-status="removed" aria-pressed="false">Removed</button><button class="filter-button" type="button" data-status="unchanged" aria-pressed="false">Unchanged</button></div></div>
     <div class="table-wrap"><table><thead><tr><th class="path-col" scope="col">File path</th><th class="status-col" scope="col">Status</th><th class="number-col before-column" scope="col">Before</th><th class="number-col" scope="col">After</th><th class="number-col" scope="col">Change</th></tr></thead><tbody id="file-rows"></tbody></table></div>
     <div class="table-foot"><span id="results" role="status" aria-live="polite"></span><div class="pagination"><button id="previous" type="button" aria-label="Previous page">Previous</button><span id="page-label"></span><button id="next" type="button" aria-label="Next page">Next</button></div></div>
@@ -223,8 +223,13 @@
   }));
   $("search").addEventListener("input", event => {state.query = event.target.value.toLocaleLowerCase().trim(); state.page = 0; render();});
   $("sort").addEventListener("change", event => {state.sort = event.target.value; state.page = 0; renderTable(filtered());});
-  $("previous").addEventListener("click", () => {state.page--; renderTable(filtered());});
-  $("next").addEventListener("click", () => {state.page++; renderTable(filtered());});
+  function changePage(direction) {
+    state.page += direction; renderTable(filtered());
+    $("files-heading").scrollIntoView({block:"start"});
+    $("files-heading").focus({preventScroll:true});
+  }
+  $("previous").addEventListener("click", () => changePage(-1));
+  $("next").addEventListener("click", () => changePage(1));
   let resizeFrame;
   if(typeof ResizeObserver !== "undefined") new ResizeObserver(() => { cancelAnimationFrame(resizeFrame); resizeFrame = requestAnimationFrame(() => renderMap(filtered())); }).observe($("treemap"));
   else window.addEventListener("resize", () => renderMap(filtered()));
