@@ -28,6 +28,14 @@ recipes record exact versions, official registry sources, and download and
 comparison commands. The [live demo](https://mengchar-cmu-f25.github.io/shipglass/)
 allows switching between both real examples and the synthetic one.
 
+Version 0.3.0's `npm` command was also exercised from an isolated installation of
+its built wheel against the public registry. `vite 6.0.0 7.0.0` reproduced the
+manual comparison's exact expanded byte totals. The scoped-package example
+`@types/node 22.0.0 22.1.0` completed with 8 changed paths and a 494-byte decrease.
+Both produced HTML, JSON, and Markdown reports without installing the downloaded
+packages. Offline tests cover download limits, registry responses, digest checks,
+redirect restrictions, errors, and temporary-file cleanup.
+
 The built-in Orbit UI example is synthetic. Repetitive fixture payloads make its
 compressed archives much smaller than typical real-world JavaScript packages.
 Its 6 MiB source map illustrates expanded size growth, not a measured production

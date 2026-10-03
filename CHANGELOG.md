@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 — 2026-10-03
+
+- Compare two exact public npm versions with `shipglass npm PACKAGE BEFORE_VERSION AFTER_VERSION`.
+- Download archives into temporary storage, verify their registry-provided digests, and remove downloads after comparison.
+- Support scoped packages, existing report formats, prefix stripping, and optional growth or packaging-caution checks.
+- Keep local-file commands offline; the new command explicitly contacts the public npm registry and never installs or runs package contents.
+
 ## 0.2.0 — 2026-10-03
 
 - Add a GitHub Action for local release archives, with a job summary and downloadable HTML, JSON, and Markdown reports.

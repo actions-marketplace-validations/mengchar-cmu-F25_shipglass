@@ -1,0 +1,39 @@
+# Compare published npm versions
+
+With Shipglass 0.3.0 or newer, one command downloads and compares two public npm releases:
+
+```sh
+shipglass npm vite 6.0.0 7.0.0 -o vite.html
+```
+
+Open `vite.html` locally. No Node.js or npm installation is needed. Shipglass downloads the published tarballs, checks their registry-provided digests, and reads the archive entries without installing packages, fetching dependencies, or running lifecycle scripts.
+
+Use a complete version number for each side. Scoped package names are supported:
+
+```sh
+shipglass npm @types/node 22.0.0 22.1.0 \
+  -o node-types.html --json node-types.json --markdown node-types.md
+```
+
+Tags such as `latest`, version ranges such as `^7`, URLs, private packages, and custom registries are unsupported. Shipglass does not choose a baseline or resolve your dependency tree.
+
+## The same reports and checks
+
+All comparison options apply, including `--strip-components`, `--fail-on-growth`, and `--fail-on-warnings`:
+
+```sh
+shipglass npm vite 6.0.0 7.0.0 \
+  -o vite.html --markdown vite.md --fail-on-growth 1000000
+```
+
+A configured check uses expanded file bytes and current-release filename cautions. Exit code 0 means the comparison completed without violating a configured check. Exit code 1 means a check failed, with reports still written. Download or archive errors return 2 without producing a new report. Existing output files are not deleted when a download fails.
+
+For these Vite versions, the measured expanded payload decreases from 2,804,531 to 2,267,804 bytes. The [reproducible Vite example](examples/vite.md) shows the same comparison using manually downloaded local archives. These totals exclude installed dependencies and do not measure application bundle size or performance.
+
+## Network and storage
+
+Only `npm` opts into downloading. The `compare`, `inspect`, and `demo` commands remain offline. The npm command requests the package names and versions you enter from `registry.npmjs.org`, using its [version metadata API](https://github.com/npm/registry/blob/main/docs/REGISTRY-API.md#getpackageversion). It accepts tarballs and redirects only on that registry over HTTPS and does not load npm credentials or `.npmrc` configuration.
+
+Metadata responses are limited to 1 MiB. Downloads are limited to 1 GiB per archive, and the normal [archive scanning limits](../README.md#compare-what-you-ship) still apply. A failed download, digest mismatch, invalid metadata response, or unsupported archive stops the comparison. Downloaded archives are temporary and are removed after the command completes or reports an error; generated reports stay at the paths you selected.
+
+Reports contain file paths and metadata, not package source contents. They are written locally and work offline. The command does not upload a report or your project files. To compare private or pre-release build outputs, prepare the archives yourself and use `shipglass compare before.tgz after.tgz`.

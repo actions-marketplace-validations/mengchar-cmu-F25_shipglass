@@ -6,6 +6,14 @@ This comparison uses the published npm archives for exactly **Vite 6.0.0** and *
 
 ## Reproduce
 
+With Shipglass 0.3.0 or newer, the same published versions can be compared directly:
+
+```sh
+shipglass npm vite 6.0.0 7.0.0 -o vite.html
+```
+
+The command downloads the archives without installing Vite. See the [npm guide](../npm.md) for network behavior and limits. The original manual recipe below also works with version 0.2.0 and separates the download step from the offline comparison.
+
 With Shipglass 0.2.0 installed, run these commands in a POSIX shell. They create a fresh temporary directory, download the two archives, and write HTML, JSON, and Markdown reports:
 
 ```sh

@@ -28,14 +28,15 @@ These projects already address related problems. The descriptions below summariz
 
 Shipglass does not aim to replace these tools. Its design priorities are a quick local run, a readable self-contained report, explicit limits, and useful output without a service or account.
 
-## Version 0.1 boundaries
+## Current boundaries
 
 - Local `.zip`, `.whl`, `.tar`, `.tgz`, and `.tar.gz` inputs.
+- An explicit `npm` command can download two exact public npm versions for comparison, without package installation or script execution.
 - Match members by their paths inside the archives, with optional explicit `--strip-components N` applied to both inputs.
 - Compare file content using SHA-256, including same-size changes.
 - Report added, removed, changed, and unchanged files.
 - Show packaging cautions based on filenames, without reading secret values into reports.
-- No registry downloads, directory comparison, semantic code diff, timestamp or permission comparison, rename detection, recursive archive inspection, or binary compatibility analysis.
+- No private registries, automatic baseline selection, directory comparison, semantic code diff, timestamp or permission comparison, rename detection, recursive archive inspection, or binary compatibility analysis.
 
 Large or unusual archives may hit reader limits. The command reports an error rather than presenting a partial comparison as complete.
 

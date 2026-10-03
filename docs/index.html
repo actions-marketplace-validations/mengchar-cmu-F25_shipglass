@@ -14,7 +14,7 @@
   <div class="topline">
     <p class="intro">Explore a release comparison.</p>
     <nav class="project" aria-label="Project">
-      <details><summary>Run locally</summary><pre>uvx --from git+https://github.com/mengchar-cmu-F25/shipglass@v0.2.0 shipglass demo -o report.html</pre></details>
+      <details><summary>Try the CLI</summary><pre id="cli-command">uvx --from git+https://github.com/mengchar-cmu-F25/shipglass@v0.3.0 shipglass demo -o report.html</pre></details>
       <a href="https://github.com/mengchar-cmu-F25/shipglass">Get Shipglass</a>
     </nav>
   </div>
@@ -57,6 +57,8 @@ frame.title = example.title;
 document.title = example.title + ' · Shipglass';
 document.getElementById('context').textContent = example.context;
 document.getElementById('recipe').href = example.recipe;
+const command = key === 'vite' ? 'npm vite 6.0.0 7.0.0' : 'demo';
+document.getElementById('cli-command').textContent = 'uvx --from git+https://github.com/mengchar-cmu-F25/shipglass@v0.3.0 shipglass ' + command + ' -o report.html';
 for (const link of document.querySelectorAll('[data-example]')) {
   if (link.dataset.example === key) link.setAttribute('aria-current', 'page');
   else link.removeAttribute('aria-current');

@@ -1,4 +1,4 @@
-"""Command line interface for local release inspection."""
+"""Command line interface for release inspection."""
 from __future__ import annotations
 
 import argparse
@@ -8,7 +8,7 @@ import tempfile
 from itertools import combinations
 from pathlib import Path
 
-from . import __version__
+from . import __version__, npm
 from .core import compare, scan
 from .demo import create_demo
 from .markdown import render_markdown
@@ -29,14 +29,19 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='See what changed inside your release. No uploads, no package scripts.')
     parser.add_argument('--version', action='version', version=f'shipglass {__version__}')
     commands = parser.add_subparsers(dest='command', required=True)
-    for name, help_text in [('compare', 'Compare two local release archives'), ('inspect', 'Inspect one local archive'), ('demo', 'Explore a synthetic release with a 6 MiB surprise')]:
+    for name, help_text in [('compare', 'Compare two local release archives'), ('npm', 'Compare two exact public npm package versions'), ('inspect', 'Inspect one local archive'), ('demo', 'Explore a synthetic release with a 6 MiB surprise')]:
         command = commands.add_parser(name, help=help_text)
         if name == 'compare':
             command.add_argument('before', type=Path)
             command.add_argument('after', type=Path)
-            command.add_argument('--fail-on-growth', type=_nonnegative, metavar='BYTES', help='Exit 1 if unpacked growth exceeds BYTES; still write reports')
+        elif name == 'npm':
+            command.add_argument('package')
+            command.add_argument('before_version')
+            command.add_argument('after_version')
         elif name == 'inspect':
             command.add_argument('artifact', type=Path)
+        if name in ('compare', 'npm'):
+            command.add_argument('--fail-on-growth', type=_nonnegative, metavar='BYTES', help='Exit 1 if unpacked growth exceeds BYTES; still write reports')
         command.add_argument('-o', '--output', type=Path, default=Path('shipglass-report.html'), help='HTML output path (default: shipglass-report.html)')
         command.add_argument('--json', type=Path, dest='json_output', metavar='PATH', help='Also write the structured comparison')
         command.add_argument('--markdown', type=Path, dest='markdown_output', metavar='PATH', help='Also write a compact Markdown summary for CI or review')
@@ -88,6 +93,20 @@ def main(argv: list[str] | None = None) -> int:
                 result = compare(scan(first), scan(second))
         elif args.command == 'compare':
             result = compare(scan(args.before, strip_components=args.strip_components), scan(args.after, strip_components=args.strip_components))
+        elif args.command == 'npm':
+            with tempfile.TemporaryDirectory(prefix='shipglass-npm-') as directory:
+                print(f'Downloading {_display(args.package)}@{_display(args.before_version)}', file=sys.stderr)
+                first = npm.download(args.package, args.before_version, Path(directory))
+                if args.after_version == args.before_version:
+                    second = first
+                else:
+                    print(f'Downloading {_display(args.package)}@{_display(args.after_version)}', file=sys.stderr)
+                    second = npm.download(args.package, args.after_version, Path(directory))
+                before = scan(first, strip_components=args.strip_components)
+                after = scan(second, strip_components=args.strip_components)
+                before['name'] = f'{args.package}@{args.before_version}'
+                after['name'] = f'{args.package}@{args.after_version}'
+                result = compare(before, after)
         else:
             current = scan(args.artifact, strip_components=args.strip_components)
             empty = {'name': 'Empty baseline', 'archive_bytes': 0, 'total_bytes': 0, 'files': [], 'warnings': [], 'format': 'empty'}
