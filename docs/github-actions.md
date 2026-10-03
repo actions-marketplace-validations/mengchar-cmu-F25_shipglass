@@ -54,7 +54,7 @@ For a build pipeline, replace the manual inputs with paths produced by your earl
 
 For a runnable example that creates its own synthetic archives, see Shipglass's [Action integration workflow](../.github/workflows/action.yml) and [workflow runs](https://github.com/mengchar-cmu-F25/shipglass/actions/workflows/action.yml).
 
-To compare two published npm versions directly, use the [manual npm workflow](npm.md#run-in-github-actions). It prepares Python and runs the CLI with package and version inputs, then saves the same report formats.
+To compare published versions directly, use the manual workflow for [npm](npm.md#run-in-github-actions) or [PyPI](pypi.md#run-in-github-actions). It prepares Python and runs the CLI with registry, package, and version inputs, then saves the same report formats.
 
 ## Review a Python wheel before release
 

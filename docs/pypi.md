@@ -32,6 +32,19 @@ Exit code 0 means the comparison completed without violating a configured check.
 
 For a candidate wheel built in your own project, use the [Python build workflow](github-actions.md#review-a-python-wheel-before-release). It compares local artifacts before publishing them.
 
+## Run in GitHub Actions
+
+The [Compare published package releases workflow](https://github.com/mengchar-cmu-F25/shipglass/actions/workflows/npm.yml) also runs PyPI comparisons. Copy [`.github/workflows/npm.yml`](../.github/workflows/npm.yml) to your repository's default branch, then select **Actions → Compare published package releases → Run workflow**. Enter all four values for the Rich example:
+
+| Input | Value |
+| --- | --- |
+| Registry | `pypi` |
+| Package | `rich` |
+| Baseline version | `13.9.4` |
+| Current version | `14.0.0` |
+
+Changing the registry does not change the other defaults. The workflow installs Shipglass v0.4.0, runs the comparison, writes a job summary, and uploads `package-release-diff` containing HTML, JSON, and Markdown. It does not install either compared wheel. Running the workflow requires repository write access; downloading the artifact requires GitHub sign-in and access to the run. The [shared workflow guide](npm.md#run-in-github-actions) explains optional checks and failure behavior.
+
 ## Network and storage
 
 This command explicitly contacts public PyPI using its [release JSON API](https://docs.pypi.org/api/json/#get-a-release). Metadata requests and redirects are restricted to HTTPS `pypi.org`; wheel downloads and redirects are restricted to HTTPS `files.pythonhosted.org`. Shipglass does not read pip configuration or credentials.

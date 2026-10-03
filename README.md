@@ -100,7 +100,7 @@ A caution asks for a packaging decision. A source map may be intentional; a file
 
 ## Use it in CI
 
-To compare two public npm versions without preparing archives, use the [manual npm workflow](docs/npm.md#run-in-github-actions).
+To compare public versions without preparing archives, use the manual workflow for [npm](docs/npm.md#run-in-github-actions) or [PyPI](docs/pypi.md#run-in-github-actions).
 
 After your workflow builds or downloads both archives onto the runner, add:
 
