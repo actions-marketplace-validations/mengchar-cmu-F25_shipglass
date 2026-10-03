@@ -56,6 +56,34 @@ For a runnable example that creates its own synthetic archives, see Shipglass's 
 
 To compare two published npm versions directly, use the [manual npm workflow](npm.md#run-in-github-actions). It prepares Python and runs the CLI with package and version inputs, then saves the same report formats.
 
+## Review a Python wheel before release
+
+Shipglass's own [test workflow](../.github/workflows/ci.yml) builds a wheel, installs that same wheel for its tests, then compares it with the explicitly selected `v0.3.2` release. The Ubuntu/Python 3.12 job saves a `shipglass-wheel-diff` artifact and summary on every push and pull request. It uses the existing build, without a second build or an optional failure threshold.
+
+For a Python project that produces one wheel, add these steps after checkout and Python setup. Replace the baseline URL with your project's previously published wheel:
+
+```yaml
+- name: Build candidate wheel
+  run: python -m pip wheel --no-deps --wheel-dir dist/candidate .
+
+- name: Download the selected baseline
+  run: |
+    curl --fail --location --output dist/baseline.whl \
+      https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.3.2/shipglass-0.3.2-py3-none-any.whl
+    cp dist/candidate/*.whl dist/candidate.whl
+
+- name: Compare wheel contents
+  uses: mengchar-cmu-F25/shipglass@v0.3.2
+  with:
+    before: dist/baseline.whl
+    after: dist/candidate.whl
+    artifact-name: wheel-diff
+```
+
+This snippet uses an Ubuntu runner. Use a clean output directory and select one matching wheel for each baseline/candidate pair; projects producing multiple platform wheels need one comparison per pair. The renamed copies distinguish the archives in the report. Keep the original wheel filenames when installing them.
+
+The baseline is an explicit release, not a rebuild or an automatically selected latest version. Update it when you want reviews to compare against a newer release. Version changes rename a wheel's `.dist-info` directory, so those metadata entries appear as added and removed. A README change can also change `METADATA` when the README supplies the package description.
+
 ## Read the result
 
 Open the workflow run's job summary for sizes, file counts, up to ten changed paths, and up to ten current-release cautions. The summary orders changed paths by absolute size change and also counts content changes with no size difference. The downloadable artifact contains:

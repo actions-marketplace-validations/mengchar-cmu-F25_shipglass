@@ -15,6 +15,22 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m pip install .
+      - name: Build and install wheel
+        run: |
+          python -m pip wheel --no-deps --wheel-dir dist/candidate .
+          python -m pip install --no-index --find-links dist/candidate shipglass
       - run: python -m unittest discover -s tests -v
       - run: shipglass demo -o demo.html --json demo.json --markdown demo.md
+      - name: Prepare wheel comparison
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.12'
+        run: |
+          curl --fail --location --output dist/shipglass-v0.3.2.whl \
+            https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.3.2/shipglass-0.3.2-py3-none-any.whl
+          cp dist/candidate/*.whl dist/shipglass-candidate.whl
+      - name: Compare wheel with v0.3.2
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.12'
+        uses: ./
+        with:
+          before: dist/shipglass-v0.3.2.whl
+          after: dist/shipglass-candidate.whl
+          artifact-name: shipglass-wheel-diff

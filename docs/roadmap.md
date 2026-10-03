@@ -10,13 +10,13 @@ Shipglass starts with a small, usable loop: compare two local release archives, 
 - Generate compact Markdown summaries for CI systems and release reviews.
 - Use the [GitHub Action](github-actions.md) to add a job summary and save reports, including when a configured check fails.
 - Download and compare two exact public npm versions with the explicit [`npm` command](npm.md).
+- Compare the project's candidate wheel with a selected published release in [CI](github-actions.md#review-a-python-wheel-before-release).
 
 ## Next: validate real release workflows
 
 - Gather reproducible examples from npm tarballs, Python wheels, and generic ZIP/TAR archives.
 - Fix parsing or path-handling gaps with focused regression tests.
 - Improve report navigation using feedback from actual package comparisons, including empty archives and packages with many files.
-- Document baseline selection and build steps for a concrete npm or Python release workflow.
 - Keep installation, demo, and Action examples verified against released versions.
 
 ## Later, if examples justify it
