@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2 — 2026-10-03
+
+- Sort the file manifest by the largest size across both releases, including removed and newly added files, independently of the treemap snapshot.
+- Clarify the size-sort option and refresh the public example reports with the corrected ordering.
+
 ## 0.3.1 — 2026-10-03
 
 - Reject gzip-compressed TAR archives with damaged checksums, incorrect expanded-size trailers, or missing trailers instead of reporting a successful scan.
