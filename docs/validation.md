@@ -91,3 +91,11 @@ isolated source installation. Version 0.4.1 includes the script through
 directory, installed in isolation, and all 99 bundled tests passed with
 `PYTHONPATH` unset. Wheel installation and the repository-based GitHub Action
 were unaffected by this source-archive omission.
+
+Version 0.4.2's **All changes** filter was checked in the browser against the real
+Rich report: 4 added, 4 removed, and 7 changed paths, excluding 72 unchanged paths.
+Switching from the third manifest page resets to the first page; search and both
+treemap snapshots preserve the filter. Synthetic inputs confirmed that equal-size
+content changes and zero-byte additions/removals remain visible, while identical
+archives produce an empty filtered view that can return to **All files**. Keyboard
+activation and a 390-pixel viewport were also checked without horizontal overflow.

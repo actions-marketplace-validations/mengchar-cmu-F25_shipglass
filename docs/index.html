@@ -16,7 +16,7 @@
     <nav class="project" aria-label="Project">
       <details><summary>Try the CLI</summary><div class="cli-panel">
         <p id="command-note" class="command-note">Reproduce this TypeScript comparison with uv and Python 3.10 or newer.</p>
-        <pre id="cli-command">uvx --from https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.1/shipglass-0.4.1-py3-none-any.whl shipglass npm typescript 4.9.5 5.0.4 -o report.html</pre>
+        <pre id="cli-command">uvx --from https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.2/shipglass-0.4.2-py3-none-any.whl shipglass npm typescript 4.9.5 5.0.4 -o report.html</pre>
         <button id="copy-command" class="copy-command" type="button">Copy command</button><span id="copy-status" class="copy-status" role="status" aria-live="polite"></span>
       </div></details>
       <a href="https://github.com/mengchar-cmu-F25/shipglass">Get Shipglass</a>
@@ -84,7 +84,7 @@ document.getElementById('copy-command').addEventListener('click', async () => {
     status.textContent = 'Select and copy the command above.';
   }
 });
-document.getElementById('cli-command').textContent = 'uvx --from https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.1/shipglass-0.4.1-py3-none-any.whl shipglass ' + example.command + ' -o report.html';
+document.getElementById('cli-command').textContent = 'uvx --from https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.2/shipglass-0.4.2-py3-none-any.whl shipglass ' + example.command + ' -o report.html';
 for (const link of document.querySelectorAll('[data-example]')) {
   if (link.dataset.example === key) link.setAttribute('aria-current', 'page');
   else link.removeAttribute('aria-current');

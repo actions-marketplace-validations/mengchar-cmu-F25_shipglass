@@ -27,4 +27,4 @@ shipglass pypi rich 13.9.4 14.0.0 \
 
 The command selects the unique non-yanked universal Python 3 wheel from each exact PyPI release, verifies its published SHA-256 and size, and removes the temporary downloads when finished. See the [PyPI guide](../pypi.md) for selection rules and network limits.
 
-Open `rich.html` locally. Search for `rich/traceback.py`, switch between Before and After, or choose the Added filter to inspect the versioned metadata. The report is self-contained and contains file metadata, not the wheels' source contents.
+Open `rich.html` locally. With Shipglass 0.4.2 or newer, choose **All changes** to see all 15 differences together, excluding the 72 unchanged paths. Search for `rich/traceback.py`, switch between Before and After, or choose **Added** to inspect the versioned metadata. **Changed** shows only the seven modified paths. The report is self-contained and contains file metadata, not the wheels' source contents.

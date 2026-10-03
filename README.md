@@ -14,17 +14,17 @@ One command. One interactive HTML report. No server, account, or runtime depende
 
 ## Try it
 
-Requires Python 3.10 or newer. Install the v0.4.1 release wheel; Git is not required:
+Requires Python 3.10 or newer. Install the v0.4.2 release wheel; Git is not required:
 
 ```sh
-uv tool install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.1/shipglass-0.4.1-py3-none-any.whl
+uv tool install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.2/shipglass-0.4.2-py3-none-any.whl
 shipglass demo -o report.html
 ```
 
 Or use pip in your Python environment:
 
 ```sh
-python -m pip install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.1/shipglass-0.4.1-py3-none-any.whl
+python -m pip install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.2/shipglass-0.4.2-py3-none-any.whl
 python -m shipglass demo -o report.html
 ```
 
@@ -92,7 +92,7 @@ The report brings together:
 
 - **Size changes:** compressed archive size, expanded file size, and the files behind the largest changes.
 - **A file treemap:** explore where the bytes went and find a large file at a glance.
-- **A searchable inventory:** filter added, removed, changed, and unchanged files.
+- **A searchable inventory:** choose **All changes** to review added, removed, and changed paths together, or filter by an individual status. Equal-size content changes still count.
 - **Content comparisons:** SHA-256 detects changed file contents even when the byte count stays the same.
 - **Packaging cautions:** highlight filenames worth checking before release, such as environment files, private-key-shaped names, and source maps.
 
@@ -106,7 +106,7 @@ After your workflow builds or downloads both archives onto the runner, add:
 
 ```yaml
 - name: Compare release archives
-  uses: mengchar-cmu-F25/shipglass@v0.4.1
+  uses: mengchar-cmu-F25/shipglass@v0.4.2
   with:
     before: dist/before.tgz
     after: dist/after.tgz

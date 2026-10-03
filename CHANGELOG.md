@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.2 — 2026-10-03
+
+- Add an **All changes** report filter that shows added, removed, and changed paths together, excluding unchanged files.
+- Keep equal-size content changes and zero-byte file additions/removals visible in this filter. Search, snapshots, and pagination continue to work together.
+- Refresh all four public example reports with the new filter.
+
 ## 0.4.1 — 2026-10-03
 
 - Include `scripts/action.py` in the source distribution so its bundled Action tests can run after installing from the source archive.
