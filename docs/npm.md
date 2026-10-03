@@ -1,5 +1,7 @@
 # Compare published npm versions
 
+Prepare Python 3.10 or newer and [install Shipglass](../README.md#try-it) first, or use the [GitHub Actions workflow](#run-in-github-actions) below without a local installation.
+
 With Shipglass 0.3.0 or newer, one command downloads and compares two public npm releases:
 
 ```sh
@@ -29,6 +31,16 @@ shipglass npm vite 6.0.0 7.0.0 \
 A configured check uses expanded file bytes and current-release filename cautions. Exit code 0 means the comparison completed without violating a configured check. Exit code 1 means a check failed, with reports still written. Download or archive errors return 2 without producing a new report. Existing output files are not deleted when a download fails.
 
 For these Vite versions, the measured expanded payload decreases from 2,804,531 to 2,267,804 bytes. The [reproducible Vite example](examples/vite.md) shows the same comparison using manually downloaded local archives. These totals exclude installed dependencies and do not measure application bundle size or performance.
+
+## Run in GitHub Actions
+
+The [Compare published npm releases workflow](https://github.com/mengchar-cmu-F25/shipglass/actions/workflows/npm.yml) runs the same CLI command and saves HTML, JSON, and Markdown reports. Repository maintainers can select **Run workflow**, then enter the package name, exact baseline version, and exact current version. The defaults compare Vite 6.0.0 with 7.0.0. Running a workflow requires write access to its repository.
+
+To run it in your own repository, copy [`.github/workflows/npm.yml`](../.github/workflows/npm.yml) to the same path on your default branch, then open your repository's Actions tab and select **Compare published npm releases → Run workflow**. The workflow prepares Python 3.12 and installs the published Shipglass v0.3.1 wheel before invoking the CLI. It does not need checkout, Node.js, or npm. You choose both versions; it does not infer a baseline from your project, install either package, or execute package scripts.
+
+After the run, read the job summary or download the `npm-release-diff` artifact and open `report.html` locally. GitHub requires sign-in and repository access to download workflow artifacts. By default, the comparison records changes without failing on growth or filename cautions. To enforce a limit, append an existing CLI option such as `--fail-on-growth 1000000` or `--fail-on-warnings` to the comparison command in your copy of the workflow.
+
+If a configured check fails, the comparison step fails but the summary and upload steps still preserve its reports. Download, validation, or archive errors fail the job without producing a new report. The summary step only reads an existing `report.md`, and the upload step ignores absent reports; neither converts a failed comparison into a successful job. These steps are skipped if the workflow is cancelled.
 
 ## Network and storage
 

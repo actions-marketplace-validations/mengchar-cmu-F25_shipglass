@@ -54,6 +54,8 @@ For a build pipeline, replace the manual inputs with paths produced by your earl
 
 For a runnable example that creates its own synthetic archives, see Shipglass's [Action integration workflow](../.github/workflows/action.yml) and [workflow runs](https://github.com/mengchar-cmu-F25/shipglass/actions/workflows/action.yml).
 
+To compare two published npm versions directly, use the [manual npm workflow](npm.md#run-in-github-actions). It prepares Python and runs the CLI with package and version inputs, then saves the same report formats.
+
 ## Read the result
 
 Open the workflow run's job summary for sizes, file counts, up to ten changed paths, and up to ten current-release cautions. The summary orders changed paths by absolute size change and also counts content changes with no size difference. The downloadable artifact contains:

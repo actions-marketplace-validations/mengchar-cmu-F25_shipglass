@@ -1,0 +1,57 @@
+name: Compare published npm releases
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Public npm package name
+        required: true
+        type: string
+        default: vite
+      before_version:
+        description: Exact baseline version
+        required: true
+        type: string
+        default: 6.0.0
+      after_version:
+        description: Exact current version
+        required: true
+        type: string
+        default: 7.0.0
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install Shipglass
+        run: python -m pip install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.3.1/shipglass-0.3.1-py3-none-any.whl
+      - name: Compare published npm releases
+        env:
+          PACKAGE: ${{ inputs.package }}
+          BEFORE_VERSION: ${{ inputs.before_version }}
+          AFTER_VERSION: ${{ inputs.after_version }}
+        run: |
+          python -m shipglass npm "$PACKAGE" "$BEFORE_VERSION" "$AFTER_VERSION" \
+            --output report.html --json report.json --markdown report.md
+      - name: Add job summary
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -f report.md ]; then
+            cat report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: npm-release-diff
+          path: |
+            report.html
+            report.json
+            report.md
+          if-no-files-found: ignore
