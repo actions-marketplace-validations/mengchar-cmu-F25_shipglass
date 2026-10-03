@@ -1,1 +1,16 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=demo.html"><title>Shipglass demo</title></head><body><p><a href="demo.html">Open the Shipglass interactive demo</a></p></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="See what changed inside your release. Shipglass compares npm tarballs, Python wheels, and ZIPs in an offline visual report.">
+<title>Shipglass — See what changed inside your release</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f7fc;color:#16243b}header{min-height:60px;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #dce4ef;background:white}p{margin:0}small{color:#5e6e84}nav{display:flex;gap:18px;align-items:center}a{color:#2c5dd3;text-decoration:none;font-weight:600}a:hover{text-decoration:underline}a:focus-visible,summary:focus-visible{outline:3px solid #6e96f2;outline-offset:4px}details{position:relative}summary{cursor:pointer;color:#2c5dd3}pre{position:absolute;right:0;top:25px;z-index:2;margin:0;padding:18px;max-width:90vw;overflow:auto;background:#16243b;color:white;border-radius:6px}iframe{display:block;width:100%;height:calc(100vh - 65px);border:0}@media(max-width:600px){header{padding:10px 16px;gap:8px;align-items:flex-start}header p{max-width:190px}small{display:block}nav{gap:12px;font-size:12px}iframe{height:calc(100svh - 85px)}pre{position:fixed;left:16px;right:16px;top:80px}}
+</style>
+</head>
+<body>
+<header><p>A tiny code change. A 6 MiB surprise.<br><small>Interactive demo with synthetic release archives.</small></p><nav aria-label="Project"><details><summary>Run locally</summary><pre>uvx --from git+https://github.com/mengchar-cmu-F25/shipglass shipglass demo -o report.html</pre></details><a href="https://github.com/mengchar-cmu-F25/shipglass">Get Shipglass on GitHub</a></nav></header>
+<iframe src="demo.html" title="Shipglass interactive release comparison" loading="eager"></iframe>
+</body>
+</html>

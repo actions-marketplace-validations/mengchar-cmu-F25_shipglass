@@ -6,11 +6,11 @@ A tiny code change can ship a surprisingly large package. Shipglass compares two
 
 One command. One interactive HTML report. No server, account, or runtime dependencies.
 
-[![Shipglass report: archive size changes, a file treemap, and packaging cautions](docs/report.jpg)](docs/demo.html)
+[![Shipglass report: archive size changes, a file treemap, and packaging cautions](docs/report.jpg)](https://mengchar-cmu-f25.github.io/shipglass/)
 
-[Explore the demo report](docs/demo.html) · [Report a bug](https://github.com/mengchar-cmu-F25/shipglass/issues) · [Roadmap](docs/roadmap.md)
+[Explore the live demo](https://mengchar-cmu-f25.github.io/shipglass/) · [Report a bug](https://github.com/mengchar-cmu-F25/shipglass/issues) · [Roadmap](docs/roadmap.md)
 
-> To view the demo from GitHub, download `docs/demo.html` and open it in your browser. You can also generate it locally with `shipglass demo`.
+> The live demo uses synthetic archives. Download `docs/demo.html` for an offline copy, or generate it locally with `shipglass demo`.
 
 ## Try it
 
