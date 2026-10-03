@@ -3,14 +3,64 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="See what changed inside your release. Shipglass compares npm tarballs, Python wheels, and ZIPs in an offline visual report.">
+<meta name="description" content="Explore real npm and Python release comparisons. Shipglass shows archive contents and size changes in an offline visual report.">
 <title>Shipglass — See what changed inside your release</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f7fc;color:#16243b}header{min-height:60px;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #dce4ef;background:white}p{margin:0}small{color:#5e6e84}nav{display:flex;gap:18px;align-items:center}a{color:#2c5dd3;text-decoration:none;font-weight:600}a:hover{text-decoration:underline}a:focus-visible,summary:focus-visible{outline:3px solid #6e96f2;outline-offset:4px}details{position:relative}summary{cursor:pointer;color:#2c5dd3}pre{position:absolute;right:0;top:25px;z-index:2;margin:0;padding:18px;max-width:90vw;overflow:auto;background:#16243b;color:white;border-radius:6px}iframe{display:block;width:100%;height:calc(100vh - 65px);border:0}@media(max-width:600px){header{padding:10px 16px;gap:8px;align-items:flex-start}header p{max-width:190px}small{display:block}nav{gap:12px;font-size:12px}iframe{height:calc(100svh - 85px)}pre{position:fixed;left:16px;right:16px;top:80px}}
+*{box-sizing:border-box}body{margin:0;height:100vh;height:100svh;display:grid;grid-template-rows:auto minmax(0,1fr);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f7fc;color:#16243b}header{padding:14px 24px 12px;border-bottom:1px solid #dce4ef;background:white}.topline{display:flex;align-items:center;justify-content:space-between;gap:16px}p{margin:0}.intro{font-weight:600}.context{font-size:12px;color:#5e6e84;margin-top:9px;max-width:90ch}nav{display:flex;gap:18px;align-items:center}a{color:#2c5dd3;text-decoration:none;font-weight:600}a:hover{text-decoration:underline}a:focus-visible,summary:focus-visible{outline:3px solid #6e96f2;outline-offset:4px}.examples{flex-wrap:wrap;gap:6px 20px;margin-top:13px}.examples a{color:#5e6e84;padding:3px 0;border-bottom:2px solid transparent}.examples a[aria-current="page"]{color:#2c5dd3;border-color:#2c5dd3}details{position:relative}summary{cursor:pointer;color:#2c5dd3;font-weight:600}pre{position:absolute;right:0;top:25px;z-index:2;margin:0;padding:18px;max-width:90vw;overflow:auto;background:#16243b;color:white;border-radius:6px}iframe{display:block;width:100%;height:100%;border:0}noscript{font-size:12px}@media(max-width:600px){header{padding:12px 16px}.topline{align-items:flex-start;gap:10px}.intro{max-width:130px}.project{gap:12px;font-size:12px}.examples{font-size:12px;gap:6px 16px}.context{font-size:11px}pre{position:fixed;left:16px;right:16px;top:70px}}
 </style>
 </head>
 <body>
-<header><p>A tiny code change. A 6 MiB surprise.<br><small>Interactive demo with synthetic release archives.</small></p><nav aria-label="Project"><details><summary>Run locally</summary><pre>uvx --from git+https://github.com/mengchar-cmu-F25/shipglass shipglass demo -o report.html</pre></details><a href="https://github.com/mengchar-cmu-F25/shipglass">Get Shipglass on GitHub</a></nav></header>
+<header>
+  <div class="topline">
+    <p class="intro">Explore a release comparison.</p>
+    <nav class="project" aria-label="Project">
+      <details><summary>Run locally</summary><pre>uvx --from git+https://github.com/mengchar-cmu-F25/shipglass@v0.2.0 shipglass demo -o report.html</pre></details>
+      <a href="https://github.com/mengchar-cmu-F25/shipglass">Get Shipglass</a>
+    </nav>
+  </div>
+  <nav class="examples" aria-label="Release examples">
+    <a href="?example=demo" data-example="demo" aria-current="page">Synthetic demo</a>
+    <a href="?example=vite" data-example="vite">Vite 6 → 7</a>
+    <a href="?example=rich" data-example="rich">Rich 13 → 14</a>
+  </nav>
+  <p class="context"><span id="context">A small source change with a 6 MiB source map added. These archives are synthetic.</span> <a id="recipe" href="https://github.com/mengchar-cmu-F25/shipglass#try-it">Reproduce this report</a></p>
+  <noscript>Open a report directly: <a href="demo.html">synthetic demo</a>, <a href="examples/vite.html">Vite</a>, or <a href="examples/rich.html">Rich</a>.</noscript>
+</header>
 <iframe src="demo.html" title="Shipglass interactive release comparison" loading="eager"></iframe>
+<script>
+const examples = {
+  demo: {
+    report: 'demo.html',
+    title: 'Shipglass synthetic release comparison',
+    context: 'A small source change with a 6 MiB source map added. These archives are synthetic.',
+    recipe: 'https://github.com/mengchar-cmu-F25/shipglass#try-it'
+  },
+  vite: {
+    report: 'examples/vite.html',
+    title: 'Vite 6.0.0 to 7.0.0 release comparison',
+    context: 'Vite 6.0.0 → 7.0.0 tarballs from npm. File paths are matched exactly; different chunk filenames appear as additions and removals.',
+    recipe: 'https://github.com/mengchar-cmu-F25/shipglass/blob/main/docs/examples/vite.md'
+  },
+  rich: {
+    report: 'examples/rich.html',
+    title: 'Rich 13.9.4 to 14.0.0 release comparison',
+    context: 'Rich 13.9.4 → 14.0.0 wheels from PyPI. Versioned .dist-info directories appear as additions and removals.',
+    recipe: 'https://github.com/mengchar-cmu-F25/shipglass/blob/main/docs/examples/rich.md'
+  }
+};
+const requested = new URLSearchParams(location.search).get('example');
+const key = Object.hasOwn(examples, requested) ? requested : 'demo';
+const example = examples[key];
+const frame = document.querySelector('iframe');
+frame.src = example.report;
+frame.title = example.title;
+document.title = example.title + ' · Shipglass';
+document.getElementById('context').textContent = example.context;
+document.getElementById('recipe').href = example.recipe;
+for (const link of document.querySelectorAll('[data-example]')) {
+  if (link.dataset.example === key) link.setAttribute('aria-current', 'page');
+  else link.removeAttribute('aria-current');
+}
+</script>
 </body>
 </html>

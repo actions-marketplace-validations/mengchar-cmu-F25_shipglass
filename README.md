@@ -10,7 +10,7 @@ One command. One interactive HTML report. No server, account, or runtime depende
 
 [Explore the live demo](https://mengchar-cmu-f25.github.io/shipglass/) · [Report a bug](https://github.com/mengchar-cmu-F25/shipglass/issues) · [Roadmap](docs/roadmap.md)
 
-> The live demo uses synthetic archives. Download `docs/demo.html` for an offline copy, or generate it locally with `shipglass demo`.
+> The demo page includes a synthetic Orbit UI example and real releases from npm and PyPI. Download `docs/demo.html` for an offline copy of the synthetic example, or generate it locally with `shipglass demo`.
 
 ## Try it
 
@@ -29,6 +29,17 @@ python -m shipglass demo -o report.html
 ```
 
 Open `report.html` in your browser. The demo is generated locally from synthetic archives; it needs no network connection or sample download after installation.
+
+## Explore real releases
+
+Open a report without installing anything, then follow its recipe to reproduce it locally:
+
+| Release archives | Expanded payload change | What the report shows |
+| --- | ---: | --- |
+| [Vite 6.0.0 → 7.0.0](https://mengchar-cmu-f25.github.io/shipglass/?example=vite) | −536,727 B (−19.1%) | Changed chunk paths and removed CJS files. [Reproduce](docs/examples/vite.md). |
+| [Rich 13.9.4 → 14.0.0](https://mengchar-cmu-f25.github.io/shipglass/?example=rich) | +3,846 B (+0.40%) | Seven modified files and versioned wheel metadata. [Reproduce](docs/examples/rich.md). |
+
+These measurements come from the published archives. They describe package contents, not installed dependency size, application bundle size, performance, or compatibility. The linked recipes include source links and exact commands; package contents were never installed or executed.
 
 ## Compare what you ship
 
