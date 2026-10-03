@@ -75,7 +75,18 @@ class ArchiveTests(unittest.TestCase):
         for name in names:
             for kind in ("zip", "tar"):
                 with self.subTest(name=name, kind=kind):
-                    path = getattr(self, kind)("bad." + kind, [(name, b"x")])
+                    stored_name = name.replace("\\", "_") if kind == "zip" else name
+                    path = getattr(self, kind)("bad." + kind, [(stored_name, b"x")])
+                    if stored_name != name:
+                        # ZipInfo normalizes native separators while writing on Windows.
+                        # Patch both serialized headers so the fixture stays hostile.
+                        raw = path.read_bytes()
+                        self.assertEqual(raw.count(stored_name.encode()), 2)
+                        raw = raw.replace(stored_name.encode(), name.encode())
+                        self.assertEqual(raw.count(name.encode()), 2)
+                        path.write_bytes(raw)
+                        with zipfile.ZipFile(path) as archive:
+                            self.assertEqual(archive.infolist()[0].orig_filename, name)
                     with self.assertRaisesRegex(ValueError, "unsafe|control"):
                         core.scan(path)
 
