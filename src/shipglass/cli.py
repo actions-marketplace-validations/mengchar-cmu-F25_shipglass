@@ -5,11 +5,13 @@ import argparse
 import json
 import sys
 import tempfile
+from itertools import combinations
 from pathlib import Path
 
 from . import __version__
 from .core import compare, scan
 from .demo import create_demo
+from .markdown import render_markdown
 from .report import render_report
 
 
@@ -37,6 +39,7 @@ def _parser() -> argparse.ArgumentParser:
             command.add_argument('artifact', type=Path)
         command.add_argument('-o', '--output', type=Path, default=Path('shipglass-report.html'), help='HTML output path (default: shipglass-report.html)')
         command.add_argument('--json', type=Path, dest='json_output', metavar='PATH', help='Also write the structured comparison')
+        command.add_argument('--markdown', type=Path, dest='markdown_output', metavar='PATH', help='Also write a compact Markdown summary for CI or review')
         command.add_argument('--fail-on-warnings', action='store_true', help='Exit 1 if the current archive has packaging cautions')
         if name != 'demo':
             command.add_argument('--strip-components', type=_nonnegative, default=0, metavar='N', help='Explicitly remove N leading path components from both archives')
@@ -60,18 +63,19 @@ def _display(value: object) -> str:
 
 def _validate_outputs(args: argparse.Namespace) -> None:
     inputs = {getattr(args, name).resolve() for name in ('before', 'after', 'artifact') if hasattr(args, name)}
-    outputs = [args.output] + ([args.json_output] if args.json_output else [])
+    outputs = [path for path in (args.output, args.json_output, args.markdown_output) if path is not None]
     resolved = [p.resolve() for p in outputs]
     if len(set(resolved)) != len(resolved):
-        raise ValueError('HTML and JSON outputs must use different paths')
+        raise ValueError('output files must use different paths')
     if inputs.intersection(resolved):
         raise ValueError('an output path must not overwrite an input archive')
     # Same-file checks also protect hard-linked aliases, which resolve() cannot see.
     for output in outputs:
         if output.exists() and any(output.samefile(p) for p in inputs if p.exists()):
             raise ValueError('an output path must not overwrite an input archive')
-    if len(outputs) == 2 and all(p.exists() for p in outputs) and outputs[0].samefile(outputs[1]):
-        raise ValueError('HTML and JSON outputs must use different files')
+    for first, second in combinations(outputs, 2):
+        if first.exists() and second.exists() and first.samefile(second):
+            raise ValueError('outputs must use different files')
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -89,9 +93,12 @@ def main(argv: list[str] | None = None) -> int:
             empty = {'name': 'Empty baseline', 'archive_bytes': 0, 'total_bytes': 0, 'files': [], 'warnings': [], 'format': 'empty'}
             result = compare(empty, current)
         html = render_report(result)
+        markdown = render_markdown(result) if args.markdown_output else None
         args.output.write_text(html, encoding='utf-8')
         if args.json_output:
             args.json_output.write_text(json.dumps(result, indent=2, ensure_ascii=True) + '\n', encoding='utf-8')
+        if args.markdown_output:
+            args.markdown_output.write_text(markdown, encoding='utf-8')
         summary = result['summary']
         print(f"Shipglass  {_display(result['before']['name'])} -> {_display(result['after']['name'])}")
         print(f"Unpacked: {_size(summary['before_bytes'])} -> {_size(summary['after_bytes'])} ({'+' if summary['delta_bytes'] >= 0 else ''}{_size(summary['delta_bytes'])})")
@@ -101,6 +108,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f'Report: {_display(args.output.resolve())}')
         if args.json_output:
             print(f'JSON: {_display(args.json_output.resolve())}')
+        if args.markdown_output:
+            print(f'Markdown: {_display(args.markdown_output.resolve())}')
         exceeded = hasattr(args, 'fail_on_growth') and args.fail_on_growth is not None and summary['delta_bytes'] > args.fail_on_growth
         if exceeded:
             print(f'Growth exceeds {args.fail_on_growth} bytes.', file=sys.stderr)

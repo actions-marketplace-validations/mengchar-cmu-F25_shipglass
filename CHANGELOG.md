@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 — 2026-10-03
+
+- Add a GitHub Action for local release archives, with a job summary and downloadable HTML, JSON, and Markdown reports.
+- Save Action reports before failing an optional expanded-size or packaging-caution check.
+- Add `--markdown PATH` to `compare`, `inspect`, and `demo` for compact summaries of sizes, changed paths, and current-release cautions.
+- Keep Markdown summaries bounded and escape archive-provided labels without including file contents, hashes, or link targets.
+- Document Action inputs, outputs, runner requirements, report privacy, and a complete workflow.
+
 ## 0.1.0 — 2026-10-03
 
 - Compare ZIP, Python wheel, TAR, and gzip-compressed TAR release archives.

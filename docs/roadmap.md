@@ -2,23 +2,26 @@
 
 Shipglass starts with a small, usable loop: compare two local release archives, read the report, and understand what changed. These are priorities, not release-date commitments.
 
-## First: make the core dependable
+## Shipped
+
+- Compare local release archives and inspect file changes in an offline HTML report.
+- Export JSON and opt into checks for expanded payload growth or packaging cautions.
+- Remove shared wrapper directories with explicit `--strip-components` path matching.
+- Generate compact Markdown summaries for CI systems and release reviews.
+- Use the [GitHub Action](github-actions.md) to add a job summary and save reports, including when a configured check fails.
+
+## Next: validate real release workflows
 
 - Gather reproducible examples from npm tarballs, Python wheels, and generic ZIP/TAR archives.
 - Fix parsing or path-handling gaps with focused regression tests.
 - Improve report navigation using feedback from actual package comparisons, including empty archives and packages with many files.
-- Make size units, compression effects, file statuses, and filename cautions clear.
-- Keep installation and demo instructions verified against the packaged CLI.
-
-## Next: reduce release-review friction
-
-- Add a short GitHub Actions example that saves reports as workflow artifacts.
-- Consider a command that snapshots a local npm package with lifecycle scripts explicitly disabled.
-- Consider Markdown summaries for CI systems that can link to an HTML report.
-- Consider directory input when a concrete build workflow needs it.
+- Document baseline selection and build steps for a concrete npm or Python release workflow.
+- Keep installation, demo, and Action examples verified against released versions.
 
 ## Later, if examples justify it
 
+- Consider a command that snapshots a local npm package with lifecycle scripts explicitly disabled.
+- Consider directory input when a concrete build workflow needs it.
 - Separate prefix mapping for each archive when the existing shared `--strip-components` option cannot express the comparison.
 - File-move suggestions, with clear separation from confirmed content changes.
 - More archive formats and richer package metadata.

@@ -1,0 +1,97 @@
+name: Shipglass release diff
+description: Compare two release archives with a visual report, job summary, and optional size checks.
+author: Mengchao Ren
+branding:
+  icon: package
+  color: blue
+inputs:
+  before:
+    description: Path to the baseline archive already present on the runner.
+    required: true
+  after:
+    description: Path to the current archive already present on the runner.
+    required: true
+  max-growth-bytes:
+    description: Fail when expanded payload growth exceeds this non-negative byte count. Empty disables the check.
+    default: ''
+  fail-on-warnings:
+    description: Fail when the current archive has filename-based packaging cautions (true or false).
+    default: 'false'
+  strip-components:
+    description: Remove this many leading path components from both archives. Shallow entries are omitted.
+    default: '0'
+  artifact-name:
+    description: Optional unique artifact name. Empty generates a distinct name for each comparison.
+    default: ''
+outputs:
+  artifact-url:
+    description: Download URL for the HTML, JSON, and Markdown reports. GitHub sign-in is required.
+    value: ${{ steps.upload.outputs.artifact-url }}
+  report-path:
+    description: Absolute HTML report path on the runner.
+    value: ${{ steps.compare.outputs.report-path }}
+  json-path:
+    description: Absolute JSON report path on the runner.
+    value: ${{ steps.compare.outputs.json-path }}
+  markdown-path:
+    description: Absolute Markdown summary path on the runner.
+    value: ${{ steps.compare.outputs.markdown-path }}
+  delta-bytes:
+    description: Change in expanded payload size, in bytes.
+    value: ${{ steps.compare.outputs.delta-bytes }}
+  warning-count:
+    description: Number of packaging cautions in the current archive.
+    value: ${{ steps.compare.outputs.warning-count }}
+  check-result:
+    description: passed or failed for configured checks; empty when no comparison could be produced.
+    value: ${{ steps.compare.outputs.check-result }}
+runs:
+  using: composite
+  steps:
+    - name: Prepare report interpreter
+      id: python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+        update-environment: 'false'
+    - name: Compare release archives
+      id: compare
+      shell: bash
+      env:
+        SHIPGLASS_PYTHON: ${{ steps.python.outputs.python-path }}
+        SHIPGLASS_ACTION_PATH: ${{ github.action_path }}
+        SHIPGLASS_BEFORE: ${{ inputs.before }}
+        SHIPGLASS_AFTER: ${{ inputs.after }}
+        SHIPGLASS_MAX_GROWTH_BYTES: ${{ inputs.max-growth-bytes }}
+        SHIPGLASS_FAIL_ON_WARNINGS: ${{ inputs.fail-on-warnings }}
+        SHIPGLASS_STRIP_COMPONENTS: ${{ inputs.strip-components }}
+      run: '"$SHIPGLASS_PYTHON" "$SHIPGLASS_ACTION_PATH/scripts/action.py"'
+    - name: Save comparison reports
+      id: upload
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.artifact-name || steps.compare.outputs.default-artifact-name }}
+        path: |
+          ${{ steps.compare.outputs.report-path }}
+          ${{ steps.compare.outputs.json-path }}
+          ${{ steps.compare.outputs.markdown-path }}
+        if-no-files-found: error
+    - name: Link downloadable report
+      shell: bash
+      env:
+        SHIPGLASS_PYTHON: ${{ steps.python.outputs.python-path }}
+        SHIPGLASS_ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+      run: |
+        "$SHIPGLASS_PYTHON" - <<'PY'
+        import os
+        from pathlib import Path
+        url = os.environ['SHIPGLASS_ARTIFACT_URL']
+        with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a', encoding='utf-8') as output:
+            output.write(f'\n[Download the interactive report and data]({url}) (GitHub sign-in required).\n')
+        PY
+    - name: Enforce configured release checks
+      if: ${{ steps.compare.outputs.check-result == 'failed' }}
+      shell: bash
+      run: |
+        echo '::error::Shipglass release checks failed. See the job summary and downloadable report.'
+        exit 1

@@ -16,6 +16,7 @@ class CliTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.report = self.root / 'report.html'
         self.data = self.root / 'report.json'
+        self.markdown = self.root / 'report.md'
 
     def archive(self, name, files):
         path = self.root / name
@@ -54,6 +55,31 @@ class CliTests(unittest.TestCase):
         second = self.archive('after.zip', {'index': 'ok'})
         self.assertEqual(self.run_cli('compare', first, second, '-o', self.report, '--fail-on-warnings')[0], 0)
         self.assertEqual(self.run_cli('inspect', first, '-o', self.report, '--fail-on-warnings')[0], 1)
+
+    def test_markdown_written_even_when_growth_check_fails(self):
+        first = self.archive('before.zip', {'index': 'old'})
+        second = self.archive('after.zip', {'index': 'longer'})
+        code, output, _ = self.run_cli('compare', first, second, '-o', self.report, '--json', self.data, '--markdown', self.markdown, '--fail-on-growth', '0')
+        self.assertEqual(code, 1)
+        self.assertIn('Shipglass', self.markdown.read_text(encoding='utf-8'))
+        self.assertIn('Markdown:', output)
+        self.assertTrue(self.report.exists())
+        self.assertTrue(self.data.exists())
+
+    def test_markdown_cannot_overwrite_archive_or_other_outputs(self):
+        package = self.archive('one.zip', {'index': 'ok'})
+        original = package.read_bytes()
+        self.assertEqual(self.run_cli('inspect', package, '-o', self.report, '--markdown', package)[0], 2)
+        self.assertEqual(package.read_bytes(), original)
+        self.assertEqual(self.run_cli('inspect', package, '-o', self.report, '--json', self.data, '--markdown', self.data)[0], 2)
+        self.assertFalse(self.report.exists())
+        self.data.write_text('Existing report', encoding='utf-8')
+        try:
+            self.markdown.hardlink_to(self.data)
+        except OSError:
+            self.skipTest('Hard links are unavailable')
+        self.assertEqual(self.run_cli('inspect', package, '-o', self.report, '--json', self.data, '--markdown', self.markdown)[0], 2)
+        self.assertEqual(self.data.read_text(encoding='utf-8'), 'Existing report')
 
     def test_inspect_is_empty_baseline(self):
         package = self.archive('one.zip', {'package/index.js': 'hi'})

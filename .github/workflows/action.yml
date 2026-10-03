@@ -1,0 +1,101 @@
+name: Action integration
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  compare:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate synthetic release archives
+        shell: bash
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, 'src')
+          from shipglass.demo import create_demo
+          create_demo(Path('action fixtures'))
+          PY
+      - name: Compare releases
+        id: report
+        uses: ./
+        with:
+          before: action fixtures/orbit-ui-1.4.0.tgz
+          after: action fixtures/orbit-ui-1.4.1.tgz
+      - name: Confirm reports and outputs
+        shell: bash
+        env:
+          REPORT_PATH: ${{ steps.report.outputs.report-path }}
+          JSON_PATH: ${{ steps.report.outputs.json-path }}
+          MARKDOWN_PATH: ${{ steps.report.outputs.markdown-path }}
+          ARTIFACT_URL: ${{ steps.report.outputs.artifact-url }}
+          CHECK_RESULT: ${{ steps.report.outputs.check-result }}
+          WARNING_COUNT: ${{ steps.report.outputs.warning-count }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          assert os.environ['CHECK_RESULT'] == 'passed'
+          assert os.environ['WARNING_COUNT'] == '4'
+          assert os.environ['ARTIFACT_URL'].startswith('https://github.com/')
+          data = json.loads(Path(os.environ['JSON_PATH']).read_text(encoding='utf-8'))
+          assert data['summary']['added'] == 4
+          assert '<!doctype html>' in Path(os.environ['REPORT_PATH']).read_text(encoding='utf-8')
+          assert 'Shipglass' in Path(os.environ['MARKDOWN_PATH']).read_text(encoding='utf-8')
+          PY
+      - name: Exceed a configured growth limit
+        id: limited
+        continue-on-error: true
+        uses: ./
+        with:
+          before: action fixtures/orbit-ui-1.4.0.tgz
+          after: action fixtures/orbit-ui-1.4.1.tgz
+          max-growth-bytes: '0'
+      - name: Verify failed check still saves reports
+        if: ${{ always() }}
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.limited.outcome }}
+          CHECK_RESULT: ${{ steps.limited.outputs.check-result }}
+          ARTIFACT_URL: ${{ steps.limited.outputs.artifact-url }}
+          FIRST_REPORT: ${{ steps.report.outputs.report-path }}
+          SECOND_REPORT: ${{ steps.limited.outputs.report-path }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          assert os.environ['OUTCOME'] == 'failure'
+          assert os.environ['CHECK_RESULT'] == 'failed'
+          assert os.environ['ARTIFACT_URL'].startswith('https://github.com/')
+          assert os.environ['FIRST_REPORT'] != os.environ['SECOND_REPORT']
+          assert Path(os.environ['SECOND_REPORT']).is_file()
+          PY
+      - name: Reject a missing archive
+        id: missing
+        continue-on-error: true
+        uses: ./
+        with:
+          before: action fixtures/missing.zip
+          after: action fixtures/orbit-ui-1.4.1.tgz
+      - name: Verify missing input never reports success
+        if: ${{ always() }}
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.missing.outcome }}
+          CHECK_RESULT: ${{ steps.missing.outputs.check-result }}
+          ARTIFACT_URL: ${{ steps.missing.outputs.artifact-url }}
+        run: |
+          python - <<'PY'
+          import os
+          assert os.environ['OUTCOME'] == 'failure'
+          assert not os.environ['CHECK_RESULT']
+          assert not os.environ['ARTIFACT_URL']
+          PY
