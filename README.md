@@ -14,21 +14,23 @@ One command. One interactive HTML report. No server, account, or runtime depende
 
 ## Try it
 
-Requires Python 3.10 or newer. Install from this repository:
+Requires Python 3.10 or newer. Install the v0.3.0 release wheel; Git is not required:
 
 ```sh
-uv tool install git+https://github.com/mengchar-cmu-F25/shipglass
+uv tool install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.3.0/shipglass-0.3.0-py3-none-any.whl
 shipglass demo -o report.html
 ```
 
-Or use pip:
+Or use pip in your Python environment:
 
 ```sh
-python -m pip install git+https://github.com/mengchar-cmu-F25/shipglass
+python -m pip install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.3.0/shipglass-0.3.0-py3-none-any.whl
 python -m shipglass demo -o report.html
 ```
 
 Open `report.html` in your browser. The demo is generated locally from synthetic archives; it needs no network connection or sample download after installation.
+
+To try a real release comparison, run `shipglass npm vite 6.0.0 7.0.0 -o vite.html`. This downloads the two public npm archives without installing or executing their contents.
 
 ## Explore real releases
 
