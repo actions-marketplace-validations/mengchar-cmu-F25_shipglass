@@ -5,7 +5,7 @@ Shipglass compares two archive files already on the runner, adds a compact job s
 ```yaml
 - name: Compare release archives
   id: shipglass
-  uses: mengchar-cmu-F25/shipglass@v0.2.0
+  uses: mengchar-cmu-F25/shipglass@v0.3.0
   with:
     before: dist/before.tgz
     after: dist/after.tgz
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Compare release archives
         id: shipglass
-        uses: mengchar-cmu-F25/shipglass@v0.2.0
+        uses: mengchar-cmu-F25/shipglass@v0.3.0
         with:
           before: ${{ inputs.before }}
           after: ${{ inputs.after }}

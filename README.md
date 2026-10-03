@@ -8,7 +8,7 @@ One command. One interactive HTML report. No server, account, or runtime depende
 
 [![Shipglass report: archive size changes, a file treemap, and packaging cautions](docs/report.jpg)](https://mengchar-cmu-f25.github.io/shipglass/)
 
-[Explore the live demo](https://mengchar-cmu-f25.github.io/shipglass/) · [Report a bug](https://github.com/mengchar-cmu-F25/shipglass/issues) · [Roadmap](docs/roadmap.md)
+[Explore the live demo](https://mengchar-cmu-f25.github.io/shipglass/) · [GitHub Marketplace](https://github.com/marketplace/actions/shipglass-release-diff) · [Report a bug](https://github.com/mengchar-cmu-F25/shipglass/issues) · [Roadmap](docs/roadmap.md)
 
 > The demo page includes a synthetic Orbit UI example and real releases from npm and PyPI. Download `docs/demo.html` for an offline copy of the synthetic example, or generate it locally with `shipglass demo`.
 
@@ -95,7 +95,7 @@ After your workflow builds or downloads both archives onto the runner, add:
 
 ```yaml
 - name: Compare release archives
-  uses: mengchar-cmu-F25/shipglass@v0.2.0
+  uses: mengchar-cmu-F25/shipglass@v0.3.0
   with:
     before: dist/before.tgz
     after: dist/after.tgz
