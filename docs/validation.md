@@ -36,6 +36,13 @@ Both produced HTML, JSON, and Markdown reports without installing the downloaded
 packages. Offline tests cover download limits, registry responses, digest checks,
 redirect restrictions, errors, and temporary-file cleanup.
 
+Version 0.3.1 adds regression coverage for damaged gzip CRC and size trailers,
+missing trailers, and TAR padding beyond the end marker. The expanded-stream
+limit accepts an input exactly at the limit and rejects one byte more. All 81
+tests passed locally. An isolated installation of the built wheel reproduced the
+Vite byte totals above and returned exit code 2 for a corrupted gzip fixture,
+without generating HTML, JSON, or Markdown reports.
+
 The built-in Orbit UI example is synthetic. Repetitive fixture payloads make its
 compressed archives much smaller than typical real-world JavaScript packages.
 Its 6 MiB source map illustrates expanded size growth, not a measured production
