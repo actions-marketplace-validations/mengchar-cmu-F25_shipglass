@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shipglass"
-version = "0.4.2"
+version = "0.4.3"
 description = "See what changed inside your release. Offline archive comparison with a visual report."
 readme = "README.md"
 requires-python = ">=3.10"

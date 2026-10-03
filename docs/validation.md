@@ -104,3 +104,11 @@ The built v0.4.2 wheel generated exactly the same synthetic comparison report as
 the source checkout. Its 99 existing tests also passed in an isolated CPython
 3.14.3 environment on macOS arm64. The CI matrix now includes the stable Python
 3.14 series across all three operating systems, alongside the earlier versions.
+
+Version 0.4.3 fixes keyboard navigation from the file manifest to the inspector.
+Enter and Space move focus to the selected file's heading, including removed and
+zero-byte files with no treemap block. Browser checks covered the real Rich
+report, a synthetic comparison, desktop and 390-pixel viewports, visible focus,
+and Tab continuing to the manifest controls. Pointer clicks retain their map
+scroll behavior. All 99 tests passed locally; an isolated installation of the
+built wheel generated the same synthetic report as the source checkout.
