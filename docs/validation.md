@@ -3,7 +3,7 @@
 The initial release was exercised on macOS with Python 3.12, using the unit tests in
 `tests/`, an isolated installation of the built wheel, and the browser report.
 GitHub Actions defines a Linux, macOS, and Windows matrix for Python 3.10, 3.12,
-and 3.13; see the live Actions results for its current status.
+3.13, and 3.14; see the live Actions results for its current status.
 
 Browser checks covered search, status filtering, sorting, before/after snapshots,
 file details, empty results, and a narrow mobile viewport. The report loads no
@@ -99,3 +99,8 @@ treemap snapshots preserve the filter. Synthetic inputs confirmed that equal-siz
 content changes and zero-byte additions/removals remain visible, while identical
 archives produce an empty filtered view that can return to **All files**. Keyboard
 activation and a 390-pixel viewport were also checked without horizontal overflow.
+
+The built v0.4.2 wheel generated exactly the same synthetic comparison report as
+the source checkout. Its 99 existing tests also passed in an isolated CPython
+3.14.3 environment on macOS arm64. The CI matrix now includes the stable Python
+3.14 series across all three operating systems, alongside the earlier versions.
