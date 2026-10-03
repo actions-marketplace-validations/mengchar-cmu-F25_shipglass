@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 — 2026-10-03
+
+- Include `scripts/action.py` in the source distribution so its bundled Action tests can run after installing from the source archive.
+
 ## 0.4.0 — 2026-10-03
 
 - Compare two exact public PyPI releases with `shipglass pypi PACKAGE BEFORE_VERSION AFTER_VERSION` when each has one unambiguous, non-yanked universal Python 3 wheel.

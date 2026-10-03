@@ -83,3 +83,11 @@ succeeded. Each downloaded `package-release-diff` artifact contained exactly
 `report.html`, `report.json`, and `report.md`, with the expected versions and byte
 totals. The release's nine OS/Python test jobs and three Action integration jobs
 also passed.
+
+Source-distribution validation found that v0.4.0 omitted `scripts/action.py` while
+including the tests that require it: six of its 99 bundled tests failed after an
+isolated source installation. Version 0.4.1 includes the script through
+`MANIFEST.in`. The actual rebuilt source archive was extracted into a temporary
+directory, installed in isolation, and all 99 bundled tests passed with
+`PYTHONPATH` unset. Wheel installation and the repository-based GitHub Action
+were unaffected by this source-archive omission.
