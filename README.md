@@ -14,17 +14,17 @@ One command. One interactive HTML report. No server, account, or runtime depende
 
 ## Try it
 
-Requires Python 3.10 or newer. Install the v0.4.3 release wheel; Git is not required:
+Requires Python 3.10 or newer. Install the v0.4.4 release wheel; Git is not required:
 
 ```sh
-uv tool install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.3/shipglass-0.4.3-py3-none-any.whl
+uv tool install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.4/shipglass-0.4.4-py3-none-any.whl
 shipglass demo -o report.html
 ```
 
 Or use pip in your Python environment:
 
 ```sh
-python -m pip install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.3/shipglass-0.4.3-py3-none-any.whl
+python -m pip install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.4/shipglass-0.4.4-py3-none-any.whl
 python -m shipglass demo -o report.html
 ```
 
@@ -106,7 +106,7 @@ After your workflow builds or downloads both archives onto the runner, add:
 
 ```yaml
 - name: Compare release archives
-  uses: mengchar-cmu-F25/shipglass@v0.4.3
+  uses: mengchar-cmu-F25/shipglass@v0.4.4
   with:
     before: dist/before.tgz
     after: dist/after.tgz

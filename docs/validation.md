@@ -112,3 +112,11 @@ report, a synthetic comparison, desktop and 390-pixel viewports, visible focus,
 and Tab continuing to the manifest controls. Pointer clicks retain their map
 scroll behavior. All 99 tests passed locally; an isolated installation of the
 built wheel generated the same synthetic report as the source checkout.
+
+Version 0.4.4 preserves treemap keyboard focus when the window is resized. The
+TypeScript example reproduced the old focus loss on the aggregate tile. Browser
+checks verified focus on both aggregate and individual file tiles across desktop
+and 390-pixel layouts, including a focused file different from the selected one.
+The aggregate-to-manifest keyboard path still works, and resizing does not take
+focus from search. All 99 tests passed; an isolated installation of the built
+wheel rendered the same TypeScript report as the source checkout.

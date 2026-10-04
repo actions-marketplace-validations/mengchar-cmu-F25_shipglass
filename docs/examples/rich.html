@@ -143,7 +143,8 @@
     else { partition(items.slice(0,split),x,y,width,height*ratio,output); partition(items.slice(split),x,y+height*ratio,width,height*(1-ratio),output); }
   }
   function renderMap(found) {
-    const host = $("treemap"); host.replaceChildren();
+    const host = $("treemap"), focused = host.contains(document.activeElement) ? document.activeElement : null;
+    host.replaceChildren();
     const present = found.filter(file => sizeFor(file) > 0).sort((a,b) => sizeFor(b) - sizeFor(a));
     const total = present.reduce((sum,file) => sum + sizeFor(file), 0);
     const snapshotTotal = data[state.snapshot].total_bytes || 0;
@@ -168,6 +169,7 @@
       button.addEventListener("click", () => { state.selected = file ? file.path : null; renderSelection(); if(group) renderAggregate(group); });
       if(file) button.dataset.path = file.path;
       host.append(button);
+      if(focused && button.dataset.path === focused.dataset.path) button.focus({preventScroll:true});
     }
   }
   function renderSelection() {
