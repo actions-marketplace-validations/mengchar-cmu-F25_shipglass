@@ -103,6 +103,8 @@ def _write_reports(reports: list[tuple[Path, str]]) -> None:
             os.replace(temporary, destination)
     finally:
         for temporary, _ in staged:
+            if os.name == 'nt' and temporary.exists():
+                temporary.chmod(stat.S_IWRITE)
             temporary.unlink(missing_ok=True)
 
 

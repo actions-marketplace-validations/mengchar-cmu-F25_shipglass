@@ -307,6 +307,22 @@ class CliTests(unittest.TestCase):
             for path in (self.report, self.data, self.markdown):
                 self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o644)
 
+    def test_failed_later_output_preserves_read_only_report_and_cleans_up(self):
+        package = self.archive('one.zip', {'index': 'ok'})
+        original = b'Previous HTML'
+        self.report.write_bytes(original)
+        self.report.chmod(0o444)
+        self.addCleanup(self.report.chmod, 0o644)
+        mode = stat.S_IMODE(self.report.stat().st_mode)
+        existing = set(self.root.iterdir())
+        code, output, error = self.run_cli('inspect', package, '-o', self.report, '--json', self.root / 'missing' / 'report.json')
+        self.assertEqual(code, 2)
+        self.assertEqual(output, '')
+        self.assertIn('missing', error)
+        self.assertEqual(self.report.read_bytes(), original)
+        self.assertEqual(stat.S_IMODE(self.report.stat().st_mode), mode)
+        self.assertEqual(set(self.root.iterdir()), existing)
+
     def test_output_symlink_updates_target_and_cannot_overwrite_input(self):
         package = self.archive('one.zip', {'index': 'ok'})
         target = self.root / 'actual-report.html'
