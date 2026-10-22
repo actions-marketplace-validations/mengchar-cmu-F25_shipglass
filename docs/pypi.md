@@ -43,7 +43,7 @@ The [Compare published package releases workflow](https://github.com/mengchar-cm
 | Baseline version | `13.9.4` |
 | Current version | `14.0.0` |
 
-Changing the registry does not change the other defaults. The workflow installs Shipglass v0.4.0, runs the comparison, writes a job summary, and uploads `package-release-diff` containing HTML, JSON, and Markdown. It does not install either compared wheel. Running the workflow requires repository write access; downloading the artifact requires GitHub sign-in and access to the run. The [shared workflow guide](npm.md#run-in-github-actions) explains optional checks and failure behavior.
+Changing the registry does not change the other defaults. The workflow installs Shipglass v0.4.5, runs the comparison, writes a job summary, and uploads `package-release-diff` containing HTML, JSON, and Markdown. It does not install either compared wheel. Running the workflow requires repository write access; downloading the artifact requires GitHub sign-in and access to the run. The [shared workflow guide](npm.md#run-in-github-actions) explains optional checks and failure behavior.
 
 See a [completed Rich comparison](https://github.com/mengchar-cmu-F25/shipglass/actions/runs/37133399124) for the workflow's summary and downloadable reports. Its expanded payload increased by 3,846 bytes, matching the local example.
 

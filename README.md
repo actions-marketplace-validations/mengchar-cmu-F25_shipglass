@@ -14,17 +14,17 @@ One command. One interactive HTML report. No server, account, or runtime depende
 
 ## Try it
 
-Requires Python 3.10 or newer. Install the v0.4.4 release wheel; Git is not required:
+Requires Python 3.10 or newer. Install the v0.4.5 release wheel; Git is not required:
 
 ```sh
-uv tool install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.4/shipglass-0.4.4-py3-none-any.whl
+uv tool install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.5/shipglass-0.4.5-py3-none-any.whl
 shipglass demo -o report.html
 ```
 
 Or use pip in your Python environment:
 
 ```sh
-python -m pip install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.4/shipglass-0.4.4-py3-none-any.whl
+python -m pip install https://github.com/mengchar-cmu-F25/shipglass/releases/download/v0.4.5/shipglass-0.4.5-py3-none-any.whl
 python -m shipglass demo -o report.html
 ```
 
@@ -106,7 +106,7 @@ After your workflow builds or downloads both archives onto the runner, add:
 
 ```yaml
 - name: Compare release archives
-  uses: mengchar-cmu-F25/shipglass@v0.4.4
+  uses: mengchar-cmu-F25/shipglass@v0.4.5
   with:
     before: dist/before.tgz
     after: dist/after.tgz
@@ -129,6 +129,8 @@ shipglass compare before.tgz after.tgz \
 ```
 
 Keep the generated reports as CI artifacts for reviewers. `--fail-on-growth` takes a byte count; `--fail-on-warnings` makes packaging cautions fail the check. These are opt-in checks. The CLI writes reports before returning exit code 1 for a failed check; invalid inputs return exit code 2.
+
+Output errors also return 2. Shipglass prepares all requested reports before replacing existing files, so a failure while writing a report leaves the previous reports intact. Each destination is then replaced separately; a failure during replacement can leave earlier destinations updated.
 
 Growth is measured as the increase in expanded payload bytes, not compressed archive size. Warnings are checked against the current archive: removing a file with a caution does not fail the check.
 
