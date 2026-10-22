@@ -1,6 +1,8 @@
 import contextlib
 import io
 import json
+import os
+import stat
 import tarfile
 import tempfile
 import unittest
@@ -237,6 +239,108 @@ class CliTests(unittest.TestCase):
         data = json.loads(self.data.read_text())
         self.assertEqual(data['summary']['before_bytes'], 0)
         self.assertEqual(data['files'][0]['path'], 'index.js')
+
+    def test_invalid_later_output_preserves_existing_reports(self):
+        package = self.archive('one.zip', {'index': 'ok'})
+        directory = self.root / 'directory'
+        directory.mkdir()
+        for invalid in (directory, self.root / 'missing' / 'report.md'):
+            with self.subTest(output=invalid):
+                originals = {self.report: b'Previous HTML', self.data: b'Previous JSON'}
+                for path, content in originals.items():
+                    path.write_bytes(content)
+                existing = set(self.root.iterdir())
+                code, output, error = self.run_cli('inspect', package, '-o', self.report, '--json', self.data, '--markdown', invalid)
+                self.assertEqual(code, 2)
+                self.assertEqual(output, '')
+                self.assertNotIn('Traceback', error)
+                for path, content in originals.items():
+                    self.assertEqual(path.read_bytes(), content)
+                self.assertEqual(set(self.root.iterdir()), existing)
+
+    def test_interrupted_report_write_preserves_existing_reports_and_cleans_up(self):
+        package = self.archive('one.zip', {'index': 'ok'})
+        originals = {self.report: b'Previous HTML', self.data: b'Previous JSON', self.markdown: b'Previous Markdown'}
+        for path, content in originals.items():
+            path.write_bytes(content)
+        existing = set(self.root.iterdir())
+        temporary_file = tempfile.NamedTemporaryFile
+        writes = 0
+
+        def interrupted_file(*args, **kwargs):
+            nonlocal writes
+            stream = temporary_file(*args, **kwargs)
+            writes += 1
+            if writes == 2:
+                write = stream.write
+
+                def interrupted_write(content):
+                    write(content[:10])
+                    raise OSError('No space left on device')
+
+                stream.write = interrupted_write
+            return stream
+
+        with mock.patch('shipglass.cli.tempfile.NamedTemporaryFile', side_effect=interrupted_file):
+            code, output, error = self.run_cli('inspect', package, '-o', self.report, '--json', self.data, '--markdown', self.markdown)
+        self.assertEqual(code, 2)
+        self.assertEqual(output, '')
+        self.assertIn('No space left on device', error)
+        self.assertNotIn('Traceback', error)
+        for path, content in originals.items():
+            self.assertEqual(path.read_bytes(), content)
+        self.assertEqual(set(self.root.iterdir()), existing)
+
+    def test_successful_report_replacement_preserves_existing_modes(self):
+        package = self.archive('one.zip', {'index': 'ok'})
+        for path in (self.report, self.data, self.markdown):
+            path.write_text('Previous report', encoding='utf-8')
+            path.chmod(0o644)
+        existing = set(self.root.iterdir())
+        code, _, error = self.run_cli('inspect', package, '-o', self.report, '--json', self.data, '--markdown', self.markdown)
+        self.assertEqual(code, 0, error)
+        self.assertIn('Shipglass', self.report.read_text(encoding='utf-8'))
+        self.assertEqual(json.loads(self.data.read_text(encoding='utf-8'))['after']['name'], package.name)
+        self.assertIn('Shipglass', self.markdown.read_text(encoding='utf-8'))
+        self.assertEqual(set(self.root.iterdir()), existing)
+        if os.name != 'nt':
+            for path in (self.report, self.data, self.markdown):
+                self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o644)
+
+    def test_failed_later_output_preserves_read_only_report_and_cleans_up(self):
+        package = self.archive('one.zip', {'index': 'ok'})
+        original = b'Previous HTML'
+        self.report.write_bytes(original)
+        self.report.chmod(0o444)
+        self.addCleanup(self.report.chmod, 0o644)
+        mode = stat.S_IMODE(self.report.stat().st_mode)
+        existing = set(self.root.iterdir())
+        code, output, error = self.run_cli('inspect', package, '-o', self.report, '--json', self.root / 'missing' / 'report.json')
+        self.assertEqual(code, 2)
+        self.assertEqual(output, '')
+        self.assertIn('missing', error)
+        self.assertEqual(self.report.read_bytes(), original)
+        self.assertEqual(stat.S_IMODE(self.report.stat().st_mode), mode)
+        self.assertEqual(set(self.root.iterdir()), existing)
+
+    def test_output_symlink_updates_target_and_cannot_overwrite_input(self):
+        package = self.archive('one.zip', {'index': 'ok'})
+        target = self.root / 'actual-report.html'
+        target.write_text('Previous report', encoding='utf-8')
+        try:
+            self.report.symlink_to(target.name)
+        except OSError:
+            self.skipTest('Symbolic links are unavailable')
+        code, _, error = self.run_cli('inspect', package, '-o', self.report)
+        self.assertEqual(code, 0, error)
+        self.assertTrue(self.report.is_symlink())
+        self.assertIn('Shipglass', target.read_text(encoding='utf-8'))
+        self.report.unlink()
+        self.report.symlink_to(package.name)
+        original = package.read_bytes()
+        self.assertEqual(self.run_cli('inspect', package, '-o', self.report)[0], 2)
+        self.assertEqual(package.read_bytes(), original)
+        self.assertTrue(self.report.is_symlink())
 
     def test_outputs_cannot_overwrite_inputs_or_each_other(self):
         package = self.archive('one.zip', {'index': 'ok'})

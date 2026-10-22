@@ -5,7 +5,7 @@ Shipglass compares two archive files already on the runner, adds a compact job s
 ```yaml
 - name: Compare release archives
   id: shipglass
-  uses: mengchar-cmu-F25/shipglass@v0.3.2
+  uses: mengchar-cmu-F25/shipglass@v0.4.5
   with:
     before: dist/before.tgz
     after: dist/after.tgz
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v7
       - name: Compare release archives
         id: shipglass
-        uses: mengchar-cmu-F25/shipglass@v0.3.2
+        uses: mengchar-cmu-F25/shipglass@v0.4.5
         with:
           before: ${{ inputs.before }}
           after: ${{ inputs.after }}
@@ -73,7 +73,7 @@ For a Python project that produces one wheel, add these steps after checkout and
     cp dist/candidate/*.whl dist/candidate.whl
 
 - name: Compare wheel contents
-  uses: mengchar-cmu-F25/shipglass@v0.3.2
+  uses: mengchar-cmu-F25/shipglass@v0.4.5
   with:
     before: dist/baseline.whl
     after: dist/candidate.whl

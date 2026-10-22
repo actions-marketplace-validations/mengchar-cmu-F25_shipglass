@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.5 — 2026-10-22
+
+- Prepare complete HTML, JSON, and Markdown reports before replacing existing output files, so a failed write does not truncate or overwrite earlier reports.
+- Reject directory output targets before changing any existing report and remove temporary report files on failure.
+- Update the copyable Action examples and public-registry workflow to the current release so they include the recent report navigation improvements.
+
+## 0.4.4 — 2026-10-03
+
+- Preserve keyboard focus on the same file or aggregate treemap block when the report is resized.
+
+## 0.4.3 — 2026-10-03
+
+- Move keyboard focus to selected file details when activating a manifest path with Enter or Space, including on narrow layouts.
+
 ## 0.4.2 — 2026-10-03
 
 - Add an **All changes** report filter that shows added, removed, and changed paths together, excluding unchanged files.

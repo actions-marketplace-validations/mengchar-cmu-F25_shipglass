@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import stat
 import sys
 import tempfile
 from itertools import combinations
@@ -76,11 +78,34 @@ def _validate_outputs(args: argparse.Namespace) -> None:
         raise ValueError('an output path must not overwrite an input archive')
     # Same-file checks also protect hard-linked aliases, which resolve() cannot see.
     for output in outputs:
+        if output.exists() and not output.is_file():
+            raise ValueError('output paths must be regular files')
         if output.exists() and any(output.samefile(p) for p in inputs if p.exists()):
             raise ValueError('an output path must not overwrite an input archive')
     for first, second in combinations(outputs, 2):
         if first.exists() and second.exists() and first.samefile(second):
             raise ValueError('outputs must use different files')
+
+
+def _write_reports(reports: list[tuple[Path, str]]) -> None:
+    staged = []
+    try:
+        for output, content in reports:
+            destination = output.resolve()
+            with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=destination.parent, prefix='.shipglass-', suffix='.tmp', delete=False) as stream:
+                temporary = Path(stream.name)
+                staged.append((temporary, destination))
+                stream.write(content)
+            if destination.exists():
+                temporary.chmod(stat.S_IMODE(destination.stat().st_mode))
+        # Each replacement is atomic; the set of reports is not a transaction.
+        for temporary, destination in staged:
+            os.replace(temporary, destination)
+    finally:
+        for temporary, _ in staged:
+            if os.name == 'nt' and temporary.exists():
+                temporary.chmod(stat.S_IWRITE)
+            temporary.unlink(missing_ok=True)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -115,11 +140,12 @@ def main(argv: list[str] | None = None) -> int:
             result = compare(empty, current)
         html = render_report(result)
         markdown = render_markdown(result) if args.markdown_output else None
-        args.output.write_text(html, encoding='utf-8')
+        reports = [(args.output, html)]
         if args.json_output:
-            args.json_output.write_text(json.dumps(result, indent=2, ensure_ascii=True) + '\n', encoding='utf-8')
+            reports.append((args.json_output, json.dumps(result, indent=2, ensure_ascii=True) + '\n'))
         if args.markdown_output:
-            args.markdown_output.write_text(markdown, encoding='utf-8')
+            reports.append((args.markdown_output, markdown))
+        _write_reports(reports)
         summary = result['summary']
         print(f"Shipglass  {_display(result['before']['name'])} -> {_display(result['after']['name'])}")
         print(f"Unpacked: {_size(summary['before_bytes'])} -> {_size(summary['after_bytes'])} ({'+' if summary['delta_bytes'] >= 0 else ''}{_size(summary['delta_bytes'])})")
